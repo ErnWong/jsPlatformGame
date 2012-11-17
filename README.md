@@ -1,3 +1,3 @@
 Game
 ====
-nothing special.
+nothing special (yet)

@@ -1,5 +1,8 @@
 (function libInit( window, triedJSON, undefined ) {
+
 "use strict";
+
+window._DEBUG = true; //set this to false, or remove it, to enchance performance (affects things like Class.js)
 
   // reference to the head element
 var head = document.getElementsByTagName( "head" )[0],

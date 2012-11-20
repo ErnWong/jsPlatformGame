@@ -21,13 +21,18 @@ lib.Class = function Class () {
 };
 
 //Just for the style of it:
-lib.Class.prototype.toString = function Class() {
+lib.Class.prototype.toString = function toString() {
   return "[object Class]";
 };
 
 lib.Class.toString = function toString() {
   return "function Class() { [lib code] }";
 };
+
+if ( !window._DEBUG ) {
+
+}
+else {
 
 //init: called automatically. This is the acutal constructor. Use this instead by overwriting it for your own class.
 /**

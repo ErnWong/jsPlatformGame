@@ -2,10 +2,9 @@
 
 "use strict";
 
-window._DEBUG = true; //set this to false, or remove it, to enchance performance (affects things like Class.js)
+window._DEBUG = true,
 
-  // reference to the head element
-var head = document.getElementsByTagName( "head" )[0],
+  head = document.getElementsByTagName( "head" )[0],
 
   // the path (URL) to the script-id-to-path key (JSON)
   SCRIPT_ID_TO_URL_PATH = "lib/Classes.js",
@@ -67,7 +66,6 @@ if ( !window.JSON && !triedJSON ) {
 // - based on mozilla's, which uses ECMA-262, 5th edition's algorithm
 if ( ![].indexOf ) {
   Array.prototype.indexOf = function( searchEl ) {
-    "use strict";
     if ( this == null ) {
       throw new TypeError("Array.prototype.indexOf called on null or undefined");
     }
@@ -90,7 +88,7 @@ if ( ![].indexOf ) {
     }
     var k = n >= 0 ? n : Math.max( len - Math.abs(n), 0 );
       for ( ; k < len; k++ ) {
-        if ( k in t && t[k] === searchElement ) {
+        if ( k in t && t[k] === searchEl ) {
           return k;
         }
       }
@@ -98,16 +96,31 @@ if ( ![].indexOf ) {
   };
 }
 
-var lib = {};
+var lib = {}, requested, executed, scriptToRequest, scriptIdToURL, ScriptRequest, loadedStrict,
+
+  createOnReadyStateChangeListener = function( scriptURL ) {
+    return function() {
+      if ( this.readyState === "loaded" || this.readyState === "complete" ) {
+        loadedStrict( scriptURL );
+      }
+    };
+  },
+
+  createOnLoadListener = function( scriptURL ) {
+    return function() {
+      loadedStrict( scriptURL );
+    };
+  };
+
 
 lib.requested = [];
-var requested = lib.requested;
+requested = lib.requested;
 
 lib.executed = [];
-var executed = lib.executed;
+executed = lib.executed;
 
 lib._scriptToRequest = {};
-var scriptToRequest = lib._scriptToRequest;
+scriptToRequest = lib._scriptToRequest;
 
 lib.scriptIdToURL = (function(path) {
 
@@ -130,7 +143,7 @@ lib.scriptIdToURL = (function(path) {
 
 })( SCRIPT_ID_TO_URL_PATH );
 
-var scriptIdToURL = lib.scriptIdToURL;
+scriptIdToURL = lib.scriptIdToURL;
 
 lib._ScriptRequest = function( scriptCount, onload, loaded ) {
   this.scriptCount = scriptCount || 0;
@@ -144,36 +157,22 @@ lib._ScriptRequest.prototype = {
   loaded: 0
 };
 
-var ScriptRequest = lib._ScriptRequest;
-
-var createOnReadyStateChangeListener = function( scriptURL ) {
-  return function() {
-    if ( this.readyState === "loaded" || this.readyState === "complete" ) {
-      loadedStrict( scriptURL );
-    }
-  };
-};
-
-var createOnLoadListener = function( scriptURL ) {
-  return function() {
-    loadedStrict( scriptURL );
-  };
-};
+ScriptRequest = lib._ScriptRequest;
 
 lib.require = function() {
 
-  var argumentCount = arguments.length;
+  var argumentCount = arguments.length,
 
-  var currentRequest = new ScriptRequest(argumentCount);
+    currentRequest = new ScriptRequest(argumentCount),
 
-  var returnObject = {
-    onload: function( method ) {
-      currentRequest.onload = method;
-      if ( currentRequest.loaded === argumentCount ) {
-        method.call( window );
+    returnObject = {
+      onload: function( method ) {
+        currentRequest.onload = method;
+        if ( currentRequest.loaded === argumentCount ) {
+          method.call( window );
+        }
       }
-    }
-  };
+    };
 
   for ( var i = 0; i < argumentCount; i++ ) {
 
@@ -230,8 +229,7 @@ lib.loaded = function( scriptId ) {
     }
   }
 };
-
-var loadedStrict = function( scriptURL ) {
+loadedStrict = function( scriptURL ) {
   if ( executed.indexOf( scriptURL ) !== -1 ) {
     return;
   }

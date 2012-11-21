@@ -53,8 +53,8 @@ if ( !window._DEBUG ) {
 
       prototype[id] = typeof def[id] === "function" &&
         typeof _super[id] === "function" && testFor_super.test( def[id] ) ?
-           modFn( id, def[id], _super ) :
-           def[id];
+          modFn( id, def[id], _super ) :
+          def[id];
 
     }
 
@@ -73,8 +73,7 @@ if ( !window._DEBUG ) {
     return Class;
 
   };
-}
-else {
+} else {
   lib.Class.extend = function extend( def, name, leaveToString ) {
 
     var _super = this.prototype;

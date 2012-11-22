@@ -1,8 +1,10 @@
-(function libInit( window, triedJSON, undefined ) {
+(function ( window, /*triedJSON,*/ undefined ) {
 
 "use strict";
 
-window._DEBUG = true,
+window._DEBUG = true;
+
+  var lib = {},
 
   head = document.getElementsByTagName( "head" )[0],
 
@@ -13,7 +15,10 @@ window._DEBUG = true,
   JSON_PATH = "http://cdnjs.cloudflare.com/ajax/libs/json3/3.2.4/json3.min.js",
 
   // a reference to an empty function
-  EMPTY_FUNCTION = Function.prototype;
+  EMPTY_FUNCTION = Function.prototype,
+
+  libInit,
+
 
 // if the head element is still not defined
 if ( !head ) {
@@ -23,8 +28,9 @@ if ( !head ) {
 
 }
 
+
 // if JSON is not defined and we haven't already tried adding one,
-if ( !window.JSON && !triedJSON ) {
+if ( !window.JSON/*&& !triedJSON*/ ) {
 
   // create a new script element and assign the properties for the JSON "polyfill".
   var jsonScript = document.createElement( "script" );
@@ -40,7 +46,7 @@ if ( !window.JSON && !triedJSON ) {
     // if the script is loaded, and libInit have not been "re-called" yet, set the flag and call this function
     if ( (this.readyState === "loaded" || this.readyState === "complete") && !recalled ) {
       recalled = true;
-      libInit( window, true );
+      libInit();
     }
 
   };
@@ -51,7 +57,7 @@ if ( !window.JSON && !triedJSON ) {
     // set the flag to true and call libInit if it hadn't been called yet
     if ( !recalled ) {
       recalled = true;
-      libInit( window, true );
+      libInit();
     }
   };
 
@@ -61,6 +67,8 @@ if ( !window.JSON && !triedJSON ) {
   return;
 
 }
+
+libInit = function libInit() {
 
 // a Array.prototype.indexOf "polyfill"
 // - based on mozilla's, which uses ECMA-262, 5th edition's algorithm
@@ -96,7 +104,7 @@ if ( ![].indexOf ) {
   };
 }
 
-var lib = {}, requested, executed, scriptToRequest, scriptIdToURL, ScriptRequest, loadedStrict,
+var requested, executed, scriptToRequest, scriptIdToURL, ScriptRequest, loadedStrict,
 
   createOnReadyStateChangeListener = function( scriptURL ) {
     return function() {
@@ -247,5 +255,7 @@ loadedStrict = function( scriptURL ) {
 };
 
 window.lib = lib;
+
+}
 
 })( window );

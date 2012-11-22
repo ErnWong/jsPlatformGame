@@ -6,7 +6,7 @@ window._DEBUG = true;
 
   var lib = {},
 
-  head = document.getElementsByTagName( "head" )[0],
+  head = window.document.getElementsByTagName( "head" )[0],
 
   // the path (URL) to the script-id-to-path key (JSON)
   SCRIPT_ID_TO_URL_PATH = "lib/Classes.js",
@@ -31,48 +31,10 @@ if ( !head ) {
 
 lib.onload = function ( fn ) {
   libInitCallbacks.push( fn );
-  if ( libInitCallbacked ) fn.call( window );
+  if ( libInitCallbacked ) {
+    fn.call( window );
+  }
 };
-
-
-// if JSON is not defined and we haven't already tried adding one,
-if ( !window.JSON/*&& !triedJSON*/ ) {
-
-  // create a new script element and assign the properties for the JSON "polyfill".
-  var jsonScript = document.createElement( "script" );
-  jsonScript.type = "text/javascript";
-  jsonScript.src = JSON_PATH;
-
-  // create a flag that says whether libInit had already been "re-called"
-  var recalled = false;
-
-  // add a ready-state-change handler
-  jsonScript.onreadystatechange = function() { //todo: check this/these
-
-    // if the script is loaded, and libInit have not been "re-called" yet, set the flag and call this function
-    if ( (this.readyState === "loaded" || this.readyState === "complete") && !recalled ) {
-      recalled = true;
-      libInit();
-    }
-
-  };
-
-  // add an onload handler (listening both events just in case)
-  jsonScript.onload = function() {
-
-    // set the flag to true and call libInit if it hadn't been called yet
-    if ( !recalled ) {
-      recalled = true;
-      libInit();
-    }
-  };
-
-  // add this element inside the head
-  head.appendChild( jsonScript );
-
-  return;
-
-}
 
 libInit = function libInit() {
 
@@ -261,11 +223,52 @@ libInit = function libInit() {
 
   window.lib = lib;
 
-  for ( ; i < libInitCallbacksLength; i++ ) {
+  for ( var i = 0, libInitCallbacksLength = libInitCallbacks.length; i < libInitCallbacksLength; i++ ) {
     libInitCallbacks[i].call(window);
-    libInitCallbacked = true;
   }
+  libInitCallbacked = true;
+
+};
+
+// if JSON is not defined and we haven't already tried adding one,
+if ( !window.JSON/*&& !triedJSON*/ ) {
+
+  // create a new script element and assign the properties for the JSON "polyfill".
+  var jsonScript = document.createElement( "script" );
+  jsonScript.type = "text/javascript";
+  jsonScript.src = JSON_PATH;
+
+  // create a flag that says whether libInit had already been "re-called"
+  var recalled = false;
+
+  // add a ready-state-change handler
+  jsonScript.onreadystatechange = function() { //todo: check this/these
+
+    // if the script is loaded, and libInit have not been "re-called" yet, set the flag and call this function
+    if ( (this.readyState === "loaded" || this.readyState === "complete") && !recalled ) {
+      recalled = true;
+      libInit();
+    }
+
+  };
+
+  // add an onload handler (listening both events just in case)
+  jsonScript.onload = function() {
+
+    // set the flag to true and call libInit if it hadn't been called yet
+    if ( !recalled ) {
+      recalled = true;
+      libInit();
+    }
+  };
+
+  // add this element inside the head
+  head.appendChild( jsonScript );
+
+  return;
 
 }
+
+libInit();
 
 })( window );

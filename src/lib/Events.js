@@ -81,6 +81,8 @@ _.EventTarget = lib.Class.extend( {
 
 }, "EventTarget" );
 
+_.EventTarget.prototype.on = _.EventTarget.prototype.addEventListener;
+
 //TODO: _.EventTarget.prototype.on = ... see other Events.js
 
 } );

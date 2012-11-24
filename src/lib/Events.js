@@ -3,10 +3,24 @@ lib.requires( "lib.Class" ).onload( function() {
 
   lib.Events = {};
   var _ = lib.Events,
+    EventListener,
     ObjToString = Object.prototype.toString,
     docCreateEvent = document.createEvent,
     EvtTypeException = new TypeError( "Event object missing \"type\" property" ),
     EvtListenerException = new TypeError( "Event Listener is not in the correct type" );
+
+
+  _.EventListener = lib.Class.extend( {
+
+    handleEvent: function() {},
+
+    init: function( handler ) {
+      this.handleEvent = handler;
+    }
+
+  }, "EventListener" );
+  EventListener = _.EventListener;
+
 
   _.EventTarget = lib.Class.extend( {
 
@@ -18,7 +32,7 @@ lib.requires( "lib.Class" ).onload( function() {
       if ( !(thisListeners == null) && ( function() {
           var thisArg = typeof scope === "object"? scope : null
           for ( var i = 0, len = thisListeners.length; i < len; i++ ) {
-            if ( thisListeners[i].listener === listener && thisListeners[i].scope === thisArg ) {
+            if ( (thisListener[i].listener === listener || thisListener[i].listener.handleEvent == listener) && thisListeners[i].scope === thisArg ) {
               return true;
             }
           }
@@ -27,7 +41,7 @@ lib.requires( "lib.Class" ).onload( function() {
         return;
       }
       var newListener = {
-        listener: typeof listener === "object" && listener.handleEvent? listener.handleEvent : listener,
+        listener: typeof listener === "object" && listener.handleEvent? listener : new EventListener( listener ),
         scope: typeof scope === "object"? scope : null
       };
       if ( ObjToString.call(thisListeners) === "[object Array]" ) {
@@ -45,7 +59,7 @@ lib.requires( "lib.Class" ).onload( function() {
           i = 0,
           len = thisListeners.length;
         for ( ; i < len; i++ ) {
-          if ( thisListener[i].listener === listener && thisListener[i].scope = thisArg ) {
+          if ( (thisListener[i].listener === listener || thisListener[i].listener.handleEvent == listener) && thisListener[i].scope = thisArg ) {
             thisListener.splice( i, 1 );
             return;
           }
@@ -73,8 +87,8 @@ lib.requires( "lib.Class" ).onload( function() {
       if ( ObjToString.call( listeners ) === "[object Array]" ) {
         for ( ; i < len; i++ ) {
           var listener = listeners[i];
-          if ( typeof listener.listener !== "function ) throw EvtListenerException;
-          listener.listener.call( listener.scope, evt );
+          if ( typeof listener.listener.handler !== "function" ) throw EvtListenerException;
+          listener.listener.handler.call( listener.scope, evt );
         }
       }
     }
@@ -82,6 +96,7 @@ lib.requires( "lib.Class" ).onload( function() {
   }, "EventTarget" );
 
   _.EventTarget.prototype.on = _.EventTarget.prototype.addEventListener;
+
 
   _.somethingOutofTheOrdinaryIForgotWhatItIsCalled = blahblahblahblah_or_maybe_more_of_a_lib.Class.extend_or_something(STUFF);
 

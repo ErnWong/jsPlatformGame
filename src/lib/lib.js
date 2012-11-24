@@ -15,7 +15,7 @@
     JSON_PATH = "http://cdnjs.cloudflare.com/ajax/libs/json3/3.2.4/json3.min.js",
 
     // a reference to an empty function
-    EMPTY_FUNCTION = Function.prototype,
+    //EMPTY_FUNCTION = Function.prototype,
 
     libInit, libInitCallbacked = false,
     libInitCallbacks = [];
@@ -123,13 +123,13 @@
 
     lib._ScriptRequest = function( scriptCount, onload, loaded ) {
       this.scriptCount = scriptCount || 0;
-      this.onload = onload || EMPTY_FUNCTION;
+      this.onload = onload || function() {};
       this.loaded = loaded || 0;
     };
 
     lib._ScriptRequest.prototype = {
       scriptCount: 0,
-      onload: EMPTY_FUNCTION,
+      onload: function() {},
       loaded: 0
     };
 

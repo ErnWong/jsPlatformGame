@@ -21,6 +21,32 @@ lib.requires( "lib.Class" ).onload( function() {
   }, "EventListener" );
   EventListener = _.EventListener;
 
+  //TODO: is this okay?...
+  _.Event = lib.Class.extend( {
+    timeStamp: 0,
+    type: "",
+    target: null,
+    cancelable: false,
+    preventDefault: function() {},
+  }, "Event" );
+
+  var eventTypes = Object.create( null );
+
+  lib.createEventType = function( eventType, def ) {
+    eventTypes[evemtType] = EventListener.extend( def );
+    return eventTypes[evemtType];
+  };
+
+  //TODO: review code
+  lib.createEvent = function( eventType ) {
+    if (eventTypes[eventType] != null ) {
+      var newEvent = new eventTypes[eventType]();
+      newEvent.timeStamp = (new Date).getTime();
+    } else {
+      return document.createEvent( eventType );
+    }
+  };
+
 
   _.EventTarget = lib.Class.extend( {
 
@@ -98,7 +124,7 @@ lib.requires( "lib.Class" ).onload( function() {
   _.EventTarget.prototype.on = _.EventTarget.prototype.addEventListener;
 
 
-  _.somethingOutofTheOrdinaryIForgotWhatItIsCalled = blahblahblahblah_or_maybe_more_of_a_lib.Class.extend_or_something(STUFF);
+  _.somethingOutofTheOrdinaryIForgotWhatItIsCalled = blahblahblahblah_or_maybe_more_of_a_lib.Class.extend_or_something(STUFF).AND.this-obviously(/does.not//Work);
 
   //TODO: _.EventTarget.prototype.on = ... see other Events.js
 

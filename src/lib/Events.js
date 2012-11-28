@@ -33,7 +33,7 @@ lib.requires( "lib.Class" ).onload( function() {
   var eventTypes = Object.create( null );
 
   lib.createEventType = function( eventType, def ) {
-    eventTypes[eventType] = EventListener.extend( def );
+    eventTypes[eventType] = EventListener.extend( def, eventType );
     return eventTypes[eventType];
   };
 
@@ -42,6 +42,7 @@ lib.requires( "lib.Class" ).onload( function() {
     if (eventTypes[eventType] != null ) {
       var newEvent = new eventTypes[eventType]();
       newEvent.timeStamp = (new Date()).getTime();
+      return newEvent;
     } else {
       return docCreateEvent( eventType );
     }

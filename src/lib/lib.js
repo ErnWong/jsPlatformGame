@@ -18,7 +18,13 @@
     //EMPTY_FUNCTION = Function.prototype,
 
     libInit, libInitCallbacked = false,
-    libInitCallbacks = [];
+    libInitCallbacks = [],
+
+    createToString = function( value ) {
+      return function toString() {
+        return value;
+      };
+    };
 
 
   // if the head element is still not defined
@@ -35,6 +41,8 @@
       fn.call( window );
     }
   };
+
+  lib.onload.toString = createToString( "function onload() { [lib code] }" );
 
   libInit = function libInit() {
 
@@ -121,11 +129,12 @@
 
     scriptIdToURL = lib.scriptIdToURL;
 
-    lib._ScriptRequest = function( scriptCount, onload, loaded ) {
+    lib._ScriptRequest = function ScriptRequest( scriptCount, onload, loaded ) {
       this.scriptCount = scriptCount || 0;
       this.onload = onload || function() {};
       this.loaded = loaded || 0;
     };
+    lib._ScriptRequest.toString = createToString( "function ScriptRequest() { [lib code] }" );
 
     lib._ScriptRequest.prototype = {
       scriptCount: 0,
@@ -135,7 +144,7 @@
 
     ScriptRequest = lib._ScriptRequest;
 
-    lib.require = function() {
+    lib.require = function require() {
 
       var i = 0,
         argumentCount = arguments.length,
@@ -186,8 +195,9 @@
       return returnObject;
 
     };
+    lib.require.toString = createToString( "function require() { [lib code] }" );
 
-    lib.loaded = function( scriptId ) {
+    lib.loaded = function loaded( scriptId ) {
       var scriptURL = scriptIdToURL[scriptId] || scriptId;
       if ( executed.indexOf( scriptURL ) !== -1 ) {
         return;
@@ -204,7 +214,8 @@
         }
       }
     };
-    loadedStrict = function( scriptURL ) {
+    lib.loaded.toString = createToString( "function loaded() { [lib code] }" );
+    loadedStrict = function loaded( scriptURL ) {
       if ( executed.indexOf( scriptURL ) !== -1 ) {
         return;
       }

@@ -97,7 +97,7 @@
 
       var Class = name?
         new Function( "return function " + name + "() {\n" +
-                      "  if ( !(this intanceof Class) ) {\n    throw new TypeError(\"Class constructor cannot be called as a function.\");\n  }\n" +
+                      "  if ( !(this instanceof lib.Class) ) {\n    throw new TypeError(\"Class constructor cannot be called as a function.\");\n  }\n" +
                       "  if ( !this.initialising && this.init ) {\n    this.init.apply( this, arguments );\n  }\n" +
                       "};" )() :
         function Class() {

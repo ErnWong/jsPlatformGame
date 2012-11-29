@@ -153,7 +153,7 @@
                     onload: function( method ) {
                         currentRequest.onload = method;
                         if ( currentRequest.loaded === argumentCount ) {
-                            method.call( window );
+                            method.call( window, window );
                         }
                     }
                 };
@@ -208,7 +208,7 @@
                 while ( scriptRequests.length /*> 0*/ ) {
                     scriptRequests[0].loaded++;
                     if ( scriptRequests[0].loaded === scriptRequests[0].scriptCount ) {
-                        scriptRequests[0].onload.call( window );
+                        scriptRequests[0].onload.call( window, window );
                     }
                     scriptRequests.splice( 0, 1 );
                 }
@@ -225,7 +225,7 @@
                 while ( scriptRequests.length /*> 0*/ ) {
                     scriptRequests[0].loaded++;
                     if ( scriptRequests[0].loaded === scriptRequests[0].scriptCount ) {
-                        scriptRequests[0].onload.call( window );
+                        scriptRequests[0].onload.call( window, window );
                     }
                     scriptRequests.splice( 0, 1 );
                 }

@@ -37,7 +37,7 @@
     lib.Class.toString = createToString( "function Class() { [lib code] }" );
 
     if ( !window._DEBUG ) {
-        lib.Class.extend = function extend( def, name, leaveToString ) {
+        lib.Class.extend = function extend( def, name, toStringIcing, leaveToString ) {
 
             var _super = this.prototype;
 

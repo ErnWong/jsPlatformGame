@@ -3,11 +3,18 @@ lib.requires( "lib.Class" ).onload( function() {
 
     lib.Events = {};
     var _ = lib.Events,
-    EventListener,
+    EventListener, LEvent,
     ObjToString = Object.prototype.toString,
     docCreateEvent = document.createEvent,
     EvtTypeException = new TypeError( "Event object missing \"type\" property" ),
-    EvtListenerException = new TypeError( "Event Listener is not in the correct type" );
+    EvtListenerException = new TypeError( "Event Listener is not in the correct type" ),
+
+
+        createToString = function( value ) {
+            return function toString() {
+                return value;
+            };
+        };
 
 
     _.EventListener = lib.Class.extend( {
@@ -27,15 +34,21 @@ lib.requires( "lib.Class" ).onload( function() {
         type: "",
         target: null,
         cancelable: false,
-        preventDefault: function() {}
+        preventDefault: function() {},
+        initEvent: function( type, target ) {
+            this.type = type;
+            this.target = target;
+        }
     }, "Event" );
+    LEvent = _.Event;
 
     var eventTypes = Object.create( null );
 
     lib.createEventType = function( eventType, def ) {
-        eventTypes[eventType] = EventListener.extend( def, eventType );
+        eventTypes[eventType] = LEvent.extend( def, eventType );
         return eventTypes[eventType];
     };
+    lib.createEventType.toString = createToString( "function createEventType() { [lib code] }" );
 
     //TODO: review code
     lib.createEvent = function( eventType ) {
@@ -47,6 +60,8 @@ lib.requires( "lib.Class" ).onload( function() {
             return docCreateEvent( eventType );
         }
     };
+
+    lib.createEvent.toString = createToString( "function createEvent() { [lib code] }" );
 
 
     _.EventTarget = lib.Class.extend( {
@@ -74,7 +89,7 @@ lib.requires( "lib.Class" ).onload( function() {
             if ( ObjToString.call(thisListeners) === "[object Array]" ) {
                 thisListeners.push( newListener );
             } else {
-                thisListeners = [newListener];
+                this._listeners[type] = [newListener];
             }
 
         },
@@ -110,24 +125,26 @@ lib.requires( "lib.Class" ).onload( function() {
             }
             var i = 0,
                 listeners = this._listeners[evt.type],
-                len = listeners;
+                len = listeners.length;
             if ( ObjToString.call( listeners ) === "[object Array]" ) {
                 for ( ; i < len; i++ ) {
                     var listener = listeners[i];
-                    if ( typeof listener.listener.handler !== "function" ) {
+                    if ( typeof listener.listener.handleEvent !== "function" ) {
                         throw EvtListenerException;
                     }
-                    listener.listener.handler.call( listener.scope, evt );
+                    listener.listener.handleEvent.call( listener.scope, evt );
                 }
             }
         }
 
     }, "EventTarget" );
 
+    _.EventTarget.prototype.addEventListener.toString = createToString( "function addEventListener() { [lib code] }" );
+    _.EventTarget.prototype.removeEventListener.toString = createToString( "function addEventListener() { [lib code] }" );
+    _.EventTarget.prototype.dispatchEvent.toString = createToString( "function addEventListener() { [lib code] }" );
+
     _.EventTarget.prototype.on = _.EventTarget.prototype.addEventListener;
 
-
-    _.somethingOutofTheOrdinaryIForgotWhatItIsCalled = blahblahblahblah_or_maybe_more_of_a_lib.Class.extend_or_something(STUFF).AND.this-obviously(/does.not//Work);
 
     //TODO: Check, and make sure everything needed is here
 

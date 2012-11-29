@@ -48,6 +48,13 @@ lib.requires( "lib.Events" ).onload( function( window ) {
                 this.args = args || [];
             }
         }, "FunctionToCall"),
+
+        createToString = function( value ) {
+            return function toString() {
+                return value;
+            };
+        },
+
         modeFromString = Object.create(null);
     modeFromString.animation = 0;
     modeFromString.steady = 1;
@@ -76,6 +83,7 @@ lib.requires( "lib.Events" ).onload( function( window ) {
                 this.delta = timer.dt;
 
                 this.type = type;
+                this.target = timer;
 
             }
 
@@ -128,7 +136,7 @@ lib.requires( "lib.Events" ).onload( function( window ) {
                 out;
             this.queue.push( newFunctionToCall );
             this.addEventListener( "tick", function onTick( evt ) {
-                if ( newFunctionToCall.sleepTimer > 0 ) {
+                if ( newFunctionToCall.sleepTime > 0 ) {
                     newFunctionToCall.sleepTime -= evt.delta;
                 } else {
                     out = method.apply( thisArg, ([evt]).concat( args ) );
@@ -144,6 +152,7 @@ lib.requires( "lib.Events" ).onload( function( window ) {
                 this.startLoop();
             }
         },
+        //TODO: removeFromQueue: function removeFromQueue( method, 
         getQueue: function getQueue() {
             return this.queue.slice(0);
         },
@@ -187,12 +196,12 @@ lib.requires( "lib.Events" ).onload( function( window ) {
             if ( this.paused ) {
                 return;
             }
-            var currentTimer = (new Date()).getTimer();
+            var currentTimer = (new Date()).getTime();
             this.dt = ( currentTimer - this.prevTime ) / 1000;
             if ( this.dt > this.maxDelta ) this.dt = this.maxDelta;
             if ( this.dt === 0 && this._recursionCounter < 4 ) {
                 this._recursionCounter++;
-                tick();
+                this.tick();
                 return;
             } else if ( this._recursionCounter > 0 ) {
                 this._recursionCounter = 0;
@@ -229,7 +238,7 @@ lib.requires( "lib.Events" ).onload( function( window ) {
 
         init: function( mode ) {
             this.mode = typeof mode === "number"? mode : modeFromString[mode];
-            if ( this.mode == null || this.mode < 0 || this.mode > 1 ) this.mode = 0;
+            if ( this.mode == null || this.mode < 0 || this.mode > 2 ) this.mode = 0;
         }
 
         //TODO: check for errors, fix errors, fix TODOs, and add any necessary things
@@ -241,5 +250,11 @@ lib.requires( "lib.Events" ).onload( function( window ) {
     lib.Timer.AS_FAST_AS_POSSIBLE = 2;
 
     lib.Timer.FunctionToCall = FunctionToCall;
+
+    lib.Timer.toString = createToString( "function Timer() { [lib code] }" );
+    lib.Timer.prototype.tick.toString = createToString( "function tick() { [lib code] }" );
+    lib.Timer.prototype.pause.toString = createToString( "function pause() { [lib code] }" );
+    lib.Timer.prototype.resume.toString = createToString( "function resume() { [lib code] }" );
+    lib.Timer.prototype.addToQueue.toString = createToString( "function addToQueue() { [lib code] }" );
 
 } );

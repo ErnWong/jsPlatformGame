@@ -103,7 +103,7 @@
         lib.executed = [];
         executed = lib.executed;
 
-        lib._scriptToRequest = {};
+        lib._scriptToRequest = Object.create(null);
         scriptToRequest = lib._scriptToRequest;
 
         lib.scriptIdToURL = (function(path) {
@@ -123,7 +123,7 @@
             }
             catch( err ) {
             }
-            return {};
+            return Object.create(null);
 
         })( SCRIPT_ID_TO_URL_PATH );
 
@@ -180,8 +180,8 @@
                 var newScript = document.createElement( "script" );
                 newScript.type = "text/javascript";
                 newScript.src = currentArg;
-                newScript.onreadystatechange = createOnReadyStateChangeListener( currentArg );
-                newScript.onload = createOnLoadListener( currentArg );
+                //newScript.onreadystatechange = createOnReadyStateChangeListener( currentArg );
+                //newScript.onload = createOnLoadListener( currentArg );
                 head.appendChild( newScript );
 
                 if ( scriptToRequest[currentArg] === undefined ) {
@@ -196,6 +196,7 @@
 
         };
         lib.require.toString = createToString( "function require() { [lib code] }" );
+        lib.requires = lib.require;
 
         lib.loaded = function loaded( scriptId ) {
             var scriptURL = scriptIdToURL[scriptId] || scriptId;

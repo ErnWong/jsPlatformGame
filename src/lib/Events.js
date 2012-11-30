@@ -148,4 +148,6 @@ lib.requires( "lib.Class" ).onload( function() {
 
     //TODO: Check, and make sure everything needed is here
 
+    lib.loaded("lib.Events");
+
 } );

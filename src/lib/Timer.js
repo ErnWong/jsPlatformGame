@@ -76,7 +76,7 @@ lib.requires( "lib.Events" ).onload( function( window ) {
             initEvent: function( type, timer ) {
 
                 //duck typing:
-                if ( timer.getFPS == null || timer.targetFPS == null || timer.delta == null ) throw notATimerException;
+                if ( timer.getFPS == null || timer.targetFPS == null || timer.dt == null ) throw notATimerException;
 
                 this.FPS = timer.getFPS();
                 this.targetFPS = timer.targetFPS;
@@ -105,7 +105,7 @@ lib.requires( "lib.Events" ).onload( function( window ) {
 
         prevTime: 0,
         dt: 0,
-        maxDelta: 50,
+        maxDelta: 0.05,
 
         //TODO: do we need this?
         setMaxDelta: function setMaximumDelta( value ) {
@@ -196,8 +196,8 @@ lib.requires( "lib.Events" ).onload( function( window ) {
             if ( this.paused ) {
                 return;
             }
-            var currentTimer = (new Date()).getTime();
-            this.dt = ( currentTimer - this.prevTime ) / 1000;
+            var currentTime = (new Date()).getTime();
+            this.dt = ( currentTime - this.prevTime ) / 1000;
             if ( this.dt > this.maxDelta ) this.dt = this.maxDelta;
             if ( this.dt === 0 && this._recursionCounter < 4 ) {
                 this._recursionCounter++;
@@ -210,7 +210,7 @@ lib.requires( "lib.Events" ).onload( function( window ) {
             var tickEvent = lib.createEvent( "TimerEvent" );
             tickEvent.initEvent( "tick", this );
             this.dispatchEvent(tickEvent);
-            this.prevTimer = currentTimer;
+            this.prevTime = currentTime;
 
             var cont = !( this.autoStartStop && this.queue.length <= 0);
             if ( this.mode === this.AS_FAST_AS_POSSIBLE && cont ) {
@@ -256,5 +256,7 @@ lib.requires( "lib.Events" ).onload( function( window ) {
     lib.Timer.prototype.pause.toString = createToString( "function pause() { [lib code] }" );
     lib.Timer.prototype.resume.toString = createToString( "function resume() { [lib code] }" );
     lib.Timer.prototype.addToQueue.toString = createToString( "function addToQueue() { [lib code] }" );
+
+    lib.loaded("lib.Timer");
 
 } );

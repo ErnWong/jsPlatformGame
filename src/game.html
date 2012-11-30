@@ -1,7 +1,91 @@
 <html>
-  <head>
-    <script type="text/javascript" src="lib/all.js"></script>
-  </head>
-  <body>
-  </body>
+    <head>
+        <script type="text/javascript" src="lib/lib.js"></script>
+        <!-- still testing and debugging -->
+        <script type="text/javascript">
+            lib.onload( function() {
+                lib.require( "lib.Timer" ).onload( function( window ) {
+                    //to test lib.js
+                    var timer = new lib.Timer(),
+                    fps = document.createElement( "div" );
+                    fps.innerHTML = "&nbsp;";
+                    fps.style.position = "absolute";
+                    fps.style.top = 600;
+                    fps.style.left = 0;
+                    fps.style.width = 800;
+                    fps.style.height = 1;
+                    fps.style.backgroundColor = "#022";
+                    bar = document.createElement( "div" );
+                    bar.innerHTML = "&nbsp;";
+                    bar.style.position = "absolute";
+                    bar.style.top = 600;
+                    bar.style.left = 0;
+                    bar.style.width = 800;
+                    bar.style.height = 1;
+                    bar.style.backgroundColor = "#555";
+                    var Box = lib.Class.extend( {
+                        x: 0,
+                        y: 0,
+                        xv: 0,
+                        yv: 0,
+                        w: 0,
+                        h: 0,
+                        div: null,
+                        update: function( evt ) {
+                            this.x += this.xv * evt.delta;
+                            this.y += this.yv * evt.delta;
+                            this.div.style.top = 600 - this.y;
+                            this.div.style.left = this.x;
+                        },
+                        init: function( x, y, xv, yv, w, h, colour ) {
+                            this.x = x;
+                            this.y = y;
+                            this.xv = xv;
+                            this.yv = yv;
+                            this.w = w;
+                            this.h = h;
+                            var div = document.createElement( "div" );
+                            div.innerHTML = "&nbsp;";
+                            div.style.position = "absolute";
+                            div.style.top = 600 - y;
+                            div.style.left = x;
+                            div.style.width = w;
+                            div.style.height = h;
+                            div.style.backgroundColor = colour;
+                            this.div = div;
+                            document.getElementsByTagName( "body" )[0].appendChild( div );
+                        }
+                    }, "Box" );
+                    var a = new Box( 100, 100, 0, -100, 50, 50, "#00F" ),
+                        b = new Box( 500, 100, 0, 100, 50, 50, "#0F0" );
+                    document.getElementsByTagName( "body" )[0].appendChild( fps );
+                    document.getElementsByTagName( "body" )[0].appendChild( bar );
+                    window.cont = true;
+                    timer.addToQueue( function( evt ) {
+                        /*var r = Math.sqrt( (b.x-a.x)*(b.x-a.x) + (b.y-a.y)*(b.y-a.y) ),
+                            rux = (b.x-a.x) / r,
+                            ruy = (b.y-a.y) / r,
+                            Fx = r*rux/100,
+                            Fy = r*ruy/100;*/
+                        var Fx = b.x - a.x,
+                            Fy = b.y - a.y;
+                        a.xv += Fx * evt.delta;
+                        a.yv += Fy * evt.delta;
+                        b.xv -= Fx * evt.delta;
+                        b.yv -= Fy * evt.delta;
+                        a.update(evt);
+                        b.update(evt);
+                        return !!cont;
+                    } );
+                    timer.addToQueue( function( evt ) {
+                        fps.style.top = 600 - evt.delta*10000;
+                        return true;
+                    } );
+                } );
+            } );
+        </script>
+    </head>
+    <body>
+
+    </body>
 </html>

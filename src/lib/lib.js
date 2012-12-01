@@ -233,6 +233,17 @@
             }
         };
 
+        lib.addFileListURL = function( URL ) {
+
+        };
+        lib.addFileList = function( data ) {
+            for ( var id in data ) { // who cares whether the data inherits Object not null, and contains things like toString or valueOf or constructor!!
+                if ( typeof data[id] === "string" ) {
+                    scriptIdToURL[id] = data[id];
+                }
+            }
+        };
+
         window.lib = lib;
 
         for ( var i = 0, libInitCallbacksLength = libInitCallbacks.length; i < libInitCallbacksLength; i++ ) {

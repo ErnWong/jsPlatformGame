@@ -1,0 +1,143 @@
+lib.requires( "game.Character", "KeyboardJS" ).onload( function() {
+
+    var onGround = true, jumpTime = 0, maxJumpTime = 0.5, gravityConstant = /*40*/80, jumpConstant = /*15*/25, jumpTimeSpeed = 1, jump = false, jumped = false, released = false,
+        left = false, right = false;
+
+    KeyboardJS.on( "up", function() {
+        jump = true;
+    }, function() {
+        jump = false;
+    } );
+
+    KeyboardJS.on( "left", function() {
+        left = true;
+    }, function() {
+        left = false;
+    } );
+    KeyboardJS.on( "right", function() {
+        right = true;
+    }, function() {
+        right = false;
+    } );
+
+    var maxJumpTimeSlider = document.getElementById( "maxJumpTimeSlider" ),
+        gravityConstantSlider = document.getElementById( "gravityConstantSlider" ),
+        jumpConstantSlider = document.getElementById( "jumpConstantSlider" );
+
+    var apexT = 0, startT = 0, endT = 0;
+
+    /*maxJumpTimeSlider.type = "range";
+    gravityConstantSlider.type = "range";
+    jumpConstantSlider.type = "range";*/
+
+    /*maxJumpTimeSlider.min = 0;
+    maxJumpTimeSlider.max = 3;
+    maxJumpTimeSlider.step = 0.0001;*/
+    maxJumpTimeSlider.value = maxJumpTime;
+    maxJumpTimeSlider.onchange = function() { maxJumpTime = +this.value; document.getElementById('mjtSliderVal').value = maxJumpTime };
+    document.getElementById('mjtSliderVal').value = maxJumpTime;
+
+    /*gravityConstantSlider.min = 0;
+    gravityConstantSlider.max = 80;
+    gravityConstantSlider.step = 0.5;*/
+    gravityConstantSlider.value = gravityConstant;
+    gravityConstantSlider.onchange = function() { gravityConstant = +this.value; document.getElementById('gcSliderVal').value = gravityConstant };
+    document.getElementById('gcSliderVal').value = gravityConstant;
+
+    /*jumpConstantSlider.min = 0;
+    jumpConstantSlider.max = 50;
+    jumpConstantSlider.step = 0.5;*/
+    jumpConstantSlider.value = jumpConstant;
+    jumpConstantSlider.onchange = function() { jumpConstant = +this.value; document.getElementById('jcSliderVal').value = jumpConstant };
+    document.getElementById('jcSliderVal').value = jumpConstant;
+
+    JumpTimeIncrementSpeedSlider.value = jumpTimeSpeed;
+    JumpTimeIncrementSpeedSlider.onchange = function() { jumpTimeSpeed = +this.value; document.getElementById('ktisSliderVal').value = jumpTimeSpeed };
+    document.getElementById('ktisSliderVal').value = jumpTimeSpeed;
+
+    /*document.getElementsByTagName("body")[0].appendChild( maxJumpTimeSlider );
+    document.getElementsByTagName("body")[0].appendChild( gravityConstantSlider );
+    document.getElementsByTagName("body")[0].appendChild( jumpConstantSlider );*/
+
+  var prevVel = 0;
+    
+    game.hero = new game.Character( function( evt ) {
+        /*if ( jumpTime > 0 && jump /*&& !released* && !onGround ) {
+            jumpTime -= evt.delta;
+            this.vel.y = jumpTime * jumpConstant;
+        } else if ( jumpTime > 0 && !onGround ) {
+            jumpTime = 0;
+            //released = true;
+        } else if ( jump && onGround && !jumped ) {
+            jumpTime = maxJumpTime;
+            this.vel.y = jumpTime * jumpConstant;
+            onGround = false;
+            jumped = true;
+        } else if ( !onGround && jumpTime === 0 ) {
+            this.vel.y -= gravityConstant * evt.delta;
+            if ( this.pos.y < 0 ) {
+                this.pos.y = 0;
+                this.vel.y = 0;
+                onGround = true;
+                //released = false;
+            }
+        }
+        if ( this.pos.y > 0 ) {
+            onGround = false;
+        }*/
+
+        var A = false, B = false, C = false, D = false;
+
+        if ( onGround && jump && !jumped ) {
+            jumpTime = maxJumpTime;
+            onGround = false;
+            jumped = true;
+            this.vel.y = jumpTime * jumpConstant;
+            startT = (new Date()).getTime();
+            A = true;
+        } else if ( !onGround && jump && jumpTime > 0 && !released ) {
+            jumpTime -= evt.delta * jumpTimeSpeed;
+            this.vel.y = jumpTime * jumpConstant;
+            B = true;
+        } else if ( !onGround && ( !jump || jumpTime <= 0 ) ) {
+            this.vel.y -= gravityConstant * evt.delta;
+            jumpTime = 0
+            released = true;
+            C = true;
+        }
+        this.pos.x += this.vel.x * evt.delta;
+        this.pos.y += this.vel.y * evt.delta; if ( this.pos.y < 0 && !A && !B ) {
+            onGround = true;
+            released = false;
+            this.pos.y = 0;
+            this.vel.y = 0;
+            endT = (new Date()).getTime();
+            console.log("start:\t"+startT+"\napex:\t"+apexT+"\nend:\t"+endT+"\n"+(100*(apexT-startT)/(endT-startT)))+"%";
+            D = true;
+        }
+        if ( !jump && onGround ) jumped = false;
+
+        if ( prevVel > 0 && this.vel.y <= 0) {
+            apexT = (new Date()).getTime();
+        }
+
+        prevVel = this.vel.y;
+
+        document.getElementById( "A" ).style.backgroundColor = A? "#0F0" : "F00";
+        document.getElementById( "B" ).style.backgroundColor = B? "#0F0" : "F00";
+        document.getElementById( "C" ).style.backgroundColor = C? "#0F0" : "F00";
+        document.getElementById( "D" ).style.backgroundColor = D? "#0F0" : "F00";
+    }, function( ctx ) {
+        ctx.fillStyle = "#03A";
+        ctx.fillRect( this.pos.x*100, 600-this.pos.y*100 - 200, 50, 100 );
+        document.getElementById( "jumpT" ).style.width = jumpTime * 200;
+        document.getElementById( "jumpTime" ).innerHTML = "&nbsp;"+jumpTime.toFixed(3);
+        document.getElementById( "jump" ).style.backgroundColor = jump? "#0F0" : "F00";
+        document.getElementById( "jumped" ).style.backgroundColor = jumped? "#0F0" : "F00";
+        document.getElementById( "released" ).style.backgroundColor = released? "#0F0" : "F00";
+        document.getElementById( "onGround" ).style.backgroundColor = onGround? "#0F0" : "F00";
+    } );
+
+    lib.loaded( "game.hero" );
+    
+} );

@@ -1,0 +1,77 @@
+<html>
+    <head>
+        <script type="text/javascript" src="lib/lib.js"></script>
+        <!-- still testing and debugging -->
+        <script type="text/javascript">
+            lib.onload( function() {
+                window.game = {};
+                window.running = true;
+                lib.addFileList( {
+                    "game.hero": "game/Hero.js.old.txt", //still finding values
+                    "game.Character": "game/Character.js",
+                    "game.Entity": "game/Entity.js",
+                    "Pnt": "game/Pnt.js",
+                    "KeyboardJS": "keyboard.js"
+                } );
+                lib.require( "lib.Timer", "game.Character", "game.hero" ).onload( function( window ) {
+                    var timer = new lib.Timer(), canvas = document.getElementById( "canvas" ), context = canvas.getContext( "2d" );
+                    timer.addToQueue( function( e ) {
+                        game.hero.update( e );
+                        context.clearRect(0, 0, canvas.width, canvas.height);
+                        game.hero.draw( context );
+                        return running;
+                    } );
+                } );
+            } );
+        </script>
+    </head>
+    <body style="font-family: consolas">
+        <canvas id="canvas" width="800px" height="600px"></canvas>
+
+<!-- testing Jumps |remove the angle bracket when completed: -->
+        <div style="position: absolute; top: 0px; left: 100px; width: 200px; height: 20px; background-color: #CCC">&nbsp;</div>
+        <div id="jumpT" style="position: absolute; top: 0px; left: 200px; width: 1px; height: 20px; background-color: #AAA; border-right-style: solid; border-right-width: 1px">&nbsp;</div>
+        <div id="jumpTime" style="position: absolute; top: 0px; left: 200px; width: 100px; height: 20px">&nbsp;</div>
+        <div id="jump" style="position: absolute; top: 40px; left: 200px; width: 20px; height: 20px; background-color: #F00">&nbsp;</div>
+        <div id="jumped" style="position: absolute; top: 90px; left: 200px; width: 20px; height: 20px; background-color: #F00">&nbsp;</div>
+        <div id="released" style="position: absolute; top: 140px; left: 200px; width: 20px; height: 20px; background-color: #F00">&nbsp;</div>
+        <div id="onGround" style="position: absolute; top: 190px; left: 200px; width: 20px; height: 20px; background-color: #F00">&nbsp;</div>
+        <div id="A" style="position: absolute; top: 240px; left: 200px; width: 20px; height: 20px; background-color: #F00">&nbsp;</div>
+        <div id="B" style="position: absolute; top: 290px; left: 200px; width: 20px; height: 20px; background-color: #F00">&nbsp;</div>
+        <div id="C" style="position: absolute; top: 340px; left: 200px; width: 20px; height: 20px; background-color: #F00">&nbsp;</div>
+        <div id="D" style="position: absolute; top: 390px; left: 200px; width: 20px; height: 20px; background-color: #F00">&nbsp;</div>
+        <div style="position: absolute; top: 0px; left: 100px">jumpTime:</div>
+        <div style="position: absolute; top: 40px; left: 100px">jump:</div>
+        <div style="position: absolute; top: 90px; left: 100px">jumped:</div>
+        <div style="position: absolute; top: 140px; left: 100px">released:</div>
+        <div style="position: absolute; top: 190px; left: 100px">onGround:</div>
+        <div style="position: absolute; top: 240px; left: 100px">A:</div>
+        <div style="position: absolute; top: 290px; left: 100px">B:</div>
+        <div style="position: absolute; top: 340px; left: 100px">C:</div>
+        <div style="position: absolute; top: 390px; left: 100px">D:</div><br />
+        <table style="border-style: solid; border-width: 1px; border-color: #DDD"><!-- sometimes, tables are not evil |remove the angle bracket when completed: -->
+            <tr>
+                <td><label>Maximum Jump-key-hold time:</label></td>
+                <td><input id="maxJumpTimeSlider" type="range" min="0" max="10" step="0.001" style="width: 800px" /></td>
+                <td><input id="mjtSliderVal" type="text" size=2 disabled /></td>
+            </tr>
+            <tr>
+                <td><label>"Gravity Constant":</label></td>
+                <td><input id="gravityConstantSlider" type="range" min="0" max="200" step="0.5" style="width: 800px" /></td>
+                <td><input id="gcSliderVal" type="text" size=2 disabled /></td>
+            </tr>
+            <tr>
+                <td><label>"Jump Constant":</label></td>
+                <td><input id="jumpConstantSlider" type="range" min="0" max="200" step="0.1" style="width: 800px" /></td>
+                <td><input id="jcSliderVal" type="text" size=2 disabled  /></td>
+            </tr>
+            <tr>
+                <td><label>"JumpTimeIncrementSpeed":</label></td>
+                <td><input id="JumpTimeIncrementSpeedSlider" type="range" min="0" max="50" step="0.1" style="width: 800px" /></td>
+                <td><input id="ktisSliderVal" type="text" size=2 disabled  /></td>
+            </tr>
+        </table>
+<!-- -->
+
+    </body>
+</html>

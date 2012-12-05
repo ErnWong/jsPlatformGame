@@ -1,17 +1,20 @@
 lib.require( "lib.Class", "lib.Math" ).onload( function( window, undefined ) {
     "use strict";
+    //TODO: test and debug!!
 
     var inverseOf = Math.inverseOf,
         integralOf = Math.integralOf,
         normalise = Math.normalize,
         getRandomNumber = Math.random;
+
+
     lib.Probability = lib.Class.extend( {
         _value: 0,
         valueOf: function valueOf() {
             return this._value;
         },
         toString: function toString() {
-            return "["+(this._value*100)+"% Chance]";
+            return "[" + (this._value*100) + "% Chance]";
         },
         get: function get() {
             return this._value;
@@ -36,7 +39,7 @@ lib.require( "lib.Class", "lib.Math" ).onload( function( window, undefined ) {
             this.set( value || 0 );
         }
     }, "Probability" );
-    var Probability = lib.Probability;
+    //var Probability = lib.Probability;
 
     lib.ProbDistrib = lib.Class.extend( {
         _fn: undefined,

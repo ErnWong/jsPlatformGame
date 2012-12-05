@@ -1,5 +1,7 @@
 (function ( window, /*triedJSON,*/ undefined ) {
 
+    //TODO: onload only after window.onload and libInitCallbacked === true
+
     "use strict";
 
     window._DEBUG = true;
@@ -28,7 +30,7 @@
 
 
     // if the head element is still not defined
-    if ( !head ) {
+    if ( !head /*TODO: maybe head == null? which is better?*/ ) {
 
         // throw a ReferenceError.
         throw new ReferenceError( "Where's the head? Cannot find the \"head\" element in the document." );
@@ -43,6 +45,9 @@
     };
 
     lib.onload.toString = createToString( "function onload() { [lib code] }" );
+
+    // temporary
+    window.lib = lib;
 
     libInit = function libInit() {
 
@@ -77,6 +82,20 @@
                     }
                 }
                 return -1;
+            };
+        }
+        // copied from MDN
+        // TODO: should we use his (http://www.calormen.com/polyfill/polyfill.js)?
+        //       or perhaps https://github.com/Modernizr/Modernizr/wiki/HTML5-Cross-browser-Polyfills??
+        //       or http://code.google.com/p/ie7-js/???
+        if (!Object.create) {
+            Object.create = function (o) {
+                if (arguments.length > 1) {
+                    throw new Error('Object.create implementation only accepts the first parameter.');
+                }
+                function F() {}
+                F.prototype = o;
+                return new F();
             };
         }
 

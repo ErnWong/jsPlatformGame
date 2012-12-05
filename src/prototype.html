@@ -3,26 +3,28 @@
         <script type="text/javascript" src="lib/lib.js"></script>
         <!-- still testing and debugging -->
         <script type="text/javascript">
-            lib.onload( function() {
-                window.game = {};
-                window.running = true;
-                lib.addFileList( {
-                    "game.hero": "game/Hero.js.old.txt", //still finding values
-                    "game.Character": "game/Character.js",
-                    "game.Entity": "game/Entity.js",
-                    "Pnt": "game/Pnt.js",
-                    "KeyboardJS": "keyboard.js"
-                } );
-                lib.require( "lib.Timer", "game.Character", "game.hero" ).onload( function( window ) {
-                    var timer = new lib.Timer(), canvas = document.getElementById( "canvas" ), context = canvas.getContext( "2d" );
-                    timer.addToQueue( function( e ) {
-                        game.hero.update( e );
-                        context.clearRect(0, 0, canvas.width, canvas.height);
-                        game.hero.draw( context );
-                        return running;
+            window.onload = function() {
+                lib.onload( function() {
+                    window.game = {};
+                    window.running = true;
+                    lib.addFileList( {
+                        "game.hero": "game/Hero.js.old.txt", //still finding values
+                        "game.Character": "game/Character.js",
+                        "game.Entity": "game/Entity.js",
+                        "Pnt": "game/Pnt.js",
+                        "KeyboardJS": "keyboard.js"
+                    } );
+                    lib.require( "lib.Timer", "game.Character", "game.hero" ).onload( function( window ) {
+                        var timer = new lib.Timer(), canvas = document.getElementById( "canvas" ), context = canvas.getContext( "2d" );
+                        timer.addToQueue( function( e ) {
+                            game.hero.update( e );
+                            context.clearRect(0, 0, canvas.width, canvas.height);
+                            game.hero.draw( context );
+                            return running;
+                        } );
                     } );
                 } );
-            } );
+            }
         </script>
     </head>
     <body style="font-family: consolas">

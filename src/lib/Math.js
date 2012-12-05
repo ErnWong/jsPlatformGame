@@ -2,7 +2,10 @@ lib.require( "lib.Class" ).onload( function() {
 
     "use strict";
 
+    //TODO: test and debug!!
     //TODO: allow caching, i.e. createFunctionFromTable(table)
+
+    var findRoot, translateFn, inverseOf, integralOf, normalize;
 
     lib.Math = {};
 
@@ -105,12 +108,12 @@ lib.require( "lib.Class" ).onload( function() {
     lib.Math.integralOf = function( f, n, a ) {
         var i, h, S;
         return function( x ) { //TODO: imporve this by allowing n to change for higher values of x (for accuracy)
-            h = (x-a) / n,
-            S = f(a);
-            for ( i = 1; i < n; i+=2 ) {
+            h = ( x-a ) / n,
+            S = f( a );
+            for ( i = 1; i < n; i += 2 ) {
                 S += 4 * f( a + h * i );
             }
-            for ( i = 2; i < n-1; i+=2 ) {
+            for ( i = 2; i < n-1; i += 2 ) {
                 S += 2 * f( a + h * i );
             }
             S += f( x );

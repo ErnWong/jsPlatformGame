@@ -1,3 +1,4 @@
+
 {
     "lib.Class": "lib/Class.js",
     "lib.Events": "lib/Events.js",
@@ -7,3 +8,4 @@
     "lib.Math": "lib/Math.js",
     "lib.Probability": "lib/Probability.js"
 }
+

@@ -1,5 +1,7 @@
 lib.require( "lib.Class" ).onload( function() {
 
+    "use strict";
+
     //TODO: allow caching, i.e. createFunctionFromTable(table)
 
     lib.Math = {};
@@ -83,7 +85,7 @@ lib.require( "lib.Class" ).onload( function() {
                 c = a, fc = fa; // Adjust c for it to have a sign opposite to that of b
             }
         }
-    }
+    };
     var findRoot = lib.Math.findRoot;
 
     lib.Math.translateFn = function( fn, dy, dx ) {
@@ -95,8 +97,8 @@ lib.require( "lib.Class" ).onload( function() {
 
     lib.Math.inverseOf = function( f, a, b, step, err ) {
         return function( x ) {
-            return findRoot( translateFn( f, -x, 0 ), a, b, err, Infinity )
-        }
+            return findRoot( translateFn( f, -x, 0 ), a, b, err, Infinity );
+        };
     };
     var inverseOf = lib.Math.inverseOf;
 
@@ -134,3 +136,4 @@ lib.require( "lib.Class" ).onload( function() {
     lib.loaded( "lib.Math" );
     
 } );
+

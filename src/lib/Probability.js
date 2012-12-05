@@ -1,4 +1,6 @@
-lib.require( "lib.Class", "lib.Math" ).onload( function() {
+lib.require( "lib.Class", "lib.Math" ).onload( function( window, undefined ) {
+    "use strict";
+
     var inverseOf = Math.inverseOf,
         integralOf = Math.integralOf,
         normalise = Math.normalize,
@@ -37,14 +39,16 @@ lib.require( "lib.Class", "lib.Math" ).onload( function() {
     var Probability = lib.Probability;
 
     lib.ProbDistrib = lib.Class.extend( {
-        _fn,
-        _samplingFn,
+        _fn: undefined,
+        _samplingFn: undefined,
         setFn: function set( fn ) {
-            if ( typeof fn !== "function" ) throw new TypeError( "Given argument to set must be a function." );
+            if ( typeof fn !== "function" ) {
+                throw new TypeError( "Given argument to set must be a function." );
+            }
             this._fn = normalise( fn );
             this.generateSamplingFunction();
         },
-        getFn: function get( fn ) {
+        getFn: function get() {
             return this._fn;
         },
         getRandom: function getRandom() {
@@ -75,4 +79,6 @@ lib.require( "lib.Class", "lib.Math" ).onload( function() {
     }, "ProbabilityDistribution" );
 
     lib.loaded( "lib.Probability" );
+
 } );
+

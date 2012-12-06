@@ -81,8 +81,8 @@ lib.require( "lib.Class", "lib.Math" ).onload( function( window, undefined ) {
         generateSamplingFunction: function generateSamplingFunction() {
             this._samplingFn = inverseOf( integralOf( this._fn, 1000, this._lowerLimit  ), this._lowerLimit, this._upperLimit, 0.001, 1E-100 );
         },
-        init: function init( fn ) {
-            this.setFn( fn );
+        init: function init( fn, n, a, b ) {
+            this.setFn( fn, n, a, b );
             this.generateSamplingFunction();
         }
     }, "ProbabilityDistribution" );

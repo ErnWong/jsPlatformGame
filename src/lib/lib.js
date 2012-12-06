@@ -1,6 +1,6 @@
 (function ( window, /*triedJSON,*/ undefined ) {
 
-    //TODO: onload only after window.onload and libInitCallbacked === true
+    //TODO: TEST: onload only after window.onload and libInitCallbacked === true
 
     "use strict";
 
@@ -21,6 +21,8 @@
 
         libInit, libInitCallbacked = false,
         libInitCallbacks = [],
+        DOMLoaded = false,
+        libLoaded = false,
 
         createToString = function( value ) {
             return function toString() {
@@ -45,6 +47,26 @@
     };
 
     lib.onload.toString = createToString( "function onload() { [lib code] }" );
+
+    var DOMOnLoad = function domOnLoad() {
+        DOMLoaded = true;
+        if ( libLoaded === true && libInitCallbacked === false ) {
+            for ( var i = 0, libInitCallbacksLength = libInitCallbacks.length; i < libInitCallbacksLength; i++ ) {
+                libInitCallbacks[i].call( window );
+            }
+            libInitCallbacked = true;
+        }
+    };
+
+    if ( window.addEventListener ) {
+        document.addEventListener( "DOMContentLoaded", DOMOnLoad, false );
+        window.addEventListener( "load", DOMOnLoad, false );
+    } else if ( window.attachEvent ) {
+        document.attachEvent( "onDOMContentLoaded", DOMOnLoad );
+        window.attachEvent( "onload", DOMOnLoad );
+    } else {
+        window.onload = DOMOnLoad;
+    }
 
     // temporary
     window.lib = lib;
@@ -265,10 +287,14 @@
 
         window.lib = lib;
 
-        for ( var i = 0, libInitCallbacksLength = libInitCallbacks.length; i < libInitCallbacksLength; i++ ) {
-            libInitCallbacks[i].call( window );
+        libLoaded = true;
+
+        if ( DOMLoaded ) {
+            for ( var i = 0, libInitCallbacksLength = libInitCallbacks.length; i < libInitCallbacksLength; i++ ) {
+                libInitCallbacks[i].call( window );
+            }
+            libInitCallbacked = true;
         }
-        libInitCallbacked = true;
 
     };
 

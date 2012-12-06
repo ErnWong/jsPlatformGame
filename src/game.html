@@ -4,6 +4,7 @@
         <script type="text/javascript" src="lib/lib.js"></script>
         <!-- still testing and debugging -->
         <script type="text/javascript">
+    /* TIMER *
             lib.onload( function() {
                 lib.require( "lib.Timer" ).onload( function( window ) {
                     //to test lib.js
@@ -63,11 +64,11 @@
                     document.getElementsByTagName( "body" )[0].appendChild( bar );
                     window.cont = true;
                     timer.addToQueue( function( evt ) {
-                        /*var r = Math.sqrt( (b.x-a.x)*(b.x-a.x) + (b.y-a.y)*(b.y-a.y) ),
-                            rux = (b.x-a.x) / r,
-                            ruy = (b.y-a.y) / r,
-                            Fx = r*rux/100,
-                            Fy = r*ruy/100;*/
+                        //var r = Math.sqrt( (b.x-a.x)*(b.x-a.x) + (b.y-a.y)*(b.y-a.y) ),
+                        //    rux = (b.x-a.x) / r,
+                        //    ruy = (b.y-a.y) / r,
+                        //    Fx = r*rux/100,
+                        //    Fy = r*ruy/100;*
                         var Fx = b.x - a.x,
                             Fy = b.y - a.y;
                         a.xv += Fx * evt.delta;
@@ -84,6 +85,14 @@
                     } );
                 } );
             } );
+    //*/
+    /* PROBABILITY */
+            lib.onload( function() {
+                lib.require( "lib.Probability" ).onload( function() {
+
+                } );
+            } );
+    //*/
         </script>
     </head>
     <body>

@@ -5,7 +5,9 @@ lib.require( "lib.Class", "lib.Math" ).onload( function( window, undefined ) {
     var inverseOf = Math.inverseOf,
         integralOf = Math.integralOf,
         normalise = Math.normalize,
-        getRandomNumber = Math.random;
+        getRandomNumber = Math.random,
+        ArraySlice = Array.prototype.slice;
+        //ObjToString = Object.prototype.toString;
 
 
     lib.Probability = lib.Class.extend( {
@@ -41,14 +43,18 @@ lib.require( "lib.Class", "lib.Math" ).onload( function( window, undefined ) {
     }, "Probability" );
     //var Probability = lib.Probability;
 
-    lib.ProbDistrib = lib.Class.extend( {
+    lib.Probability.ProbDistrib = lib.Class.extend( {
         _fn: undefined,
+        _lowerLimit: undefined,
+        _upperLimit: undefined,
         _samplingFn: undefined,
-        setFn: function set( fn ) {
+        setFn: function set( fn, n, a, b ) {
             if ( typeof fn !== "function" ) {
                 throw new TypeError( "Given argument to set must be a function." );
             }
-            this._fn = normalise( fn );
+            this._fn = normalise( fn, n, a, b );
+            this._lowerLimit = a;
+            this._upperLimit = b;
             this.generateSamplingFunction();
         },
         getFn: function get() {
@@ -73,13 +79,23 @@ lib.require( "lib.Class", "lib.Math" ).onload( function( window, undefined ) {
             return this._samplingFn;
         },
         generateSamplingFunction: function generateSamplingFunction() {
-            this._samplingFn = inverseOf( integralOf( this._fn ) );
+            this._samplingFn = inverseOf( integralOf( this._fn, 1000, this._lowerLimit  ), this._lowerLimit, this._upperLimit, 0.001, 1E-100 );
         },
         init: function init( fn ) {
             this.setFn( fn );
             this.generateSamplingFunction();
         }
     }, "ProbabilityDistribution" );
+
+    lib.Probability.testList = function( probabilities ) {
+        var a = ArraySlice.call( probabilities ),
+            probSum = 0;
+        while ( a.length > 0 && Math.random() >= a[0] / ( 1 - probSum ) ) {
+            probSum += a[0];
+            a.shift();
+        }
+        return probabilities.length - a.length;
+    };
 
     lib.loaded( "lib.Probability" );
 

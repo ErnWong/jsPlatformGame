@@ -4,7 +4,7 @@
 
     "use strict";
 
-    window._DEBUG = true;
+    //window._DEBUG = true;
 
     var lib = {},
 

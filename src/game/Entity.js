@@ -7,3 +7,4 @@ lib.require( "lib.Events.EventTarget", "Pnt" ).onload( function() {
     }, "Entity" );
     lib.loaded( "game.Entity" );
 } );
+

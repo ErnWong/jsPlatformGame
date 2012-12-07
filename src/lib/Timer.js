@@ -76,7 +76,9 @@ lib.requires( "lib.Events" ).onload( function( window ) {
             initEvent: function( type, timer ) {
 
                 //duck typing:
-                if ( timer.getFPS == null || timer.targetFPS == null || timer.dt == null ) throw notATimerException;
+                if ( timer.getFPS == null || timer.targetFPS == null || timer.dt == null ) {
+                    throw notATimerException;
+                }
 
                 this.FPS = timer.getFPS();
                 this.targetFPS = timer.targetFPS;
@@ -149,7 +151,7 @@ lib.requires( "lib.Events" ).onload( function( window ) {
                         this.queue.splice( this.queue.indexOf( newFunctionToCall ), 1 );
                     }
                 }
-            }
+            };
             if ( this._tickHandlersFromMethod[method] == null ) {
                 this._tickHandlersFromMethod[method] = [tickHandler];
             } else {
@@ -166,7 +168,7 @@ lib.requires( "lib.Events" ).onload( function( window ) {
                 idInQueue = this.queue.indexOf( method );
             if ( idInQueue !== -1 ) {
                 var i = 0,
-                    len = tickHandlers.length,
+                    len = tickHandlers.length;
                 for ( ; i < len; i++ ) {
                     this.removeEventListener( "tick", tickHandlers[i], this );
                 }
@@ -218,7 +220,9 @@ lib.requires( "lib.Events" ).onload( function( window ) {
             }
             var currentTime = (new Date()).getTime();
             this.dt = ( currentTime - this.prevTime ) / 1000;
-            if ( this.dt > this.maxDelta ) this.dt = this.maxDelta;
+            if ( this.dt > this.maxDelta ) {
+                this.dt = this.maxDelta;
+            }
             if ( this.dt === 0 && this._recursionCounter < 4 ) {
                 this._recursionCounter++;
                 this.tick();
@@ -258,7 +262,9 @@ lib.requires( "lib.Events" ).onload( function( window ) {
 
         init: function( mode ) {
             this.mode = typeof mode === "number"? mode : modeFromString[mode];
-            if ( this.mode == null || this.mode < 0 || this.mode > 2 ) this.mode = 0;
+            if ( this.mode == null || this.mode < 0 || this.mode > 2 ) {
+                this.mode = 0;
+            }
         }
 
         //TODO: check for errors, fix errors, fix TODOs, and add any necessary things
@@ -281,3 +287,4 @@ lib.requires( "lib.Events" ).onload( function( window ) {
     lib.loaded("lib.Timer");
 
 } );
+

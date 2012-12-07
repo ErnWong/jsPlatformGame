@@ -1,3 +1,5 @@
+//TODO: allow stopping of sound
+
 lib.require( "lib.Events", "lib.Resources" ).onload( function(window, undefined) {
     "use strict";
 
@@ -34,33 +36,57 @@ lib.require( "lib.Events", "lib.Resources" ).onload( function(window, undefined)
         playing: false,
         play: function( volume ) {
             var audio = this.audio,
-                volume = typeof volume === "number"? volume : 1,
-                playEvent = lib.createEvent( "AudioEvent" );
+                vol = typeof volume === "number"? volume : 1,
+                playEvent = lib.createEvent( "AudioEvent" ),
+                restarted = false,
+                restartEvent;
             if ( this.playing === true ) {
+                restartEvent = lib.createEvent( "AudioEvent" );
+                restartEvent.initEvent( "beforeRestart", this, {
+                    channel: this,
+                    cancelable: true
+                } );
+                if ( this.dispatchEvent( restartEvent ) === true ) {
+                    return;
+                }
                 audio.pause();
                 audio.currentTime = 0;
+                restarted = true;
             }
             this.playing = true;
-            audio.volume = volume > 1? 1 : volume < 0? 0 : volume;
+            audio.volume = vol > 1? 1 : vol < 0? 0 : vol;
             playEvent.initEvent( "beforePlay", this, {
                 channel: this,
                 cancelable: true
             } );
             if ( this.dispatchEvent( playEvent ) ) {
-                return
+                return;
             }
             audio.play();
+            restartEvent = lib.createEvent( "AudioEvent" );
+            restartEvent.initEvent( "restart", this, {
+                channel: this,
+                cancelable: false
+            } );
             playEvent = lib.createEvent( "AudioEvent" );
             playEvent.initEvent( "play", this, {
                 channel: this,
                 cancelable: false
             } );
+            this.dispatchEvent( restartEvent );
+            this.dispatchEvent( playEvent );
         },
         init: function( audio ) {
             this.audio = audio.cloneNode( true );
             var self = this;
             this.audio.addEventListener( "ended", function() {
                 self.playing = false;
+                var endedEvent = lib.createEvent( "AudioEvent" );
+                endedEvent.initEvent( "ended", self, {
+                    channel: self,
+                    cancelable: false
+                } );
+                self.dispatchEvent( endedEvent );
             } );
         }
     }, "Channel" );
@@ -90,7 +116,7 @@ lib.require( "lib.Events", "lib.Resources" ).onload( function(window, undefined)
                     i = 0;
                 }
             }
-            playEvent.initEvent( "beforePlay", this {
+            playEvent.initEvent( "beforePlay", this, {
                 sound: this,
                 channel: channels[i],
                 newChannelAdded: newChannelAdded,
@@ -116,7 +142,7 @@ lib.require( "lib.Events", "lib.Resources" ).onload( function(window, undefined)
             this.audio = src != null? new Audio( src ) : new Audio();
             this.src = src != null? String( src ) : "";
             this.channels = [];
-            this.autoResize = Boolean( autoresize );
+            this.autoResize = Boolean( autoResize );
             var i = 0, len = typeof noOfChannels === "number"? noOfChannels >= 0? noOfChannels : 0 : 3;
             for ( ; i < len; i++ ) {
                 this.channels[i] = new Channel( this.audio );
@@ -156,7 +182,8 @@ lib.require( "lib.Events", "lib.Resources" ).onload( function(window, undefined)
             var sound = this.getSound( id ),
                 sndId = this._sounds.indexOf( sound ),
                 soundFromSrc = this._soundFromSrc,
-                soundFromId = this._soundFromId;
+                soundFromId = this._soundFromId,
+                i;
 
             var removeSoundEvt = lib.createEvent( "AudioEvent" );
             removeSoundEvt.initEvent( "beforeRemove", this, {
@@ -167,13 +194,15 @@ lib.require( "lib.Events", "lib.Resources" ).onload( function(window, undefined)
                 return;
             }
 
-            if ( sndId > -1 ) this._sounds.splice( sndId, -1 );
+            if ( sndId > -1 ) {
+                this._sounds.splice( sndId, -1 );
+            }
             if ( soundFromSrc[id] != null && sound === soundFromSrc[id] ) {
                 delete soundFromSrc[id];
             } else if ( sound.src !== "" && sound === soundFromSrc[sound.src] ) {
                 delete soundFromSrc[sound.src];
             } else {
-                for ( var i in soundFromSrc ) {
+                for ( i in soundFromSrc ) {
                     if ( sound === soundFromSrc[i] ) {
                         delete soundFromSrc[i];
                         break;
@@ -183,7 +212,7 @@ lib.require( "lib.Events", "lib.Resources" ).onload( function(window, undefined)
             if ( soundFromId[id] != null && sound === soundFromId[id] ) {
                 delete soundFromId[id];
             } else {
-                for ( var i in soundFromId ) {
+                for ( i in soundFromId ) {
                     if ( sound === soundFromId[i] ) {
                         delete soundFromId[i];
                         break;
@@ -212,15 +241,18 @@ lib.require( "lib.Events", "lib.Resources" ).onload( function(window, undefined)
                 sound: sound,
                 cancelable: true
             } );
-            if ( this.dispatchEvent( 
+            if ( this.dispatchEvent( playEvent ) === true ) {
+                return;
+            }
             this.getSound( id ).play( volume );
             playEvent = lib.createEvent( "AudioEvent" );
             playEvent.initEvent( "play", this, {
                 sound: sound,
-                cancelable: false,
+                cancelable: false
             } );
             this.dispatchEvent( playEvent );
         }
     } );
-
+    lib.loaded( "lib.Audio" );
 } );
+

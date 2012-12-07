@@ -26,3 +26,4 @@ lib.require( "lib.Class" ).onload( function() {
     }, "Vector" );
     lib.loaded( "Pnt" );
  } );
+

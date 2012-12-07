@@ -57,3 +57,4 @@ lib.requires( "game.Character", "KeyboardJS" ).onload( function() {
     lib.loaded( "game.hero" );
     
 } );
+

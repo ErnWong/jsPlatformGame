@@ -15,3 +15,4 @@ lib.require( "game.Entity", "Pnt" ).onload( function() {
 
     lib.loaded( "game.Character" );
 } );
+

@@ -82,8 +82,7 @@ lib.requires( "lib.Events" ).onload( function( window ) {
                 this.targetFPS = timer.targetFPS;
                 this.delta = timer.dt;
 
-                this.type = type;
-                this.target = timer;
+                this._super( type, timer );
 
             }
 
@@ -91,6 +90,8 @@ lib.requires( "lib.Events" ).onload( function( window ) {
 
         _clearIntervalFlag: false,
         _recursionCounter: 0,
+
+        _tickHandlersFromMethod: Object.create(null),
 
         running: false,
         paused: false,
@@ -135,7 +136,8 @@ lib.requires( "lib.Events" ).onload( function( window ) {
             var newFunctionToCall = new FunctionToCall( method, thisArg, args ),
                 out;
             this.queue.push( newFunctionToCall );
-            this.addEventListener( "tick", function onTick( evt ) {
+
+            var tickHandler = function onTick( evt ) {
                 if ( newFunctionToCall.sleepTime > 0 ) {
                     newFunctionToCall.sleepTime -= evt.delta;
                 } else {
@@ -147,12 +149,30 @@ lib.requires( "lib.Events" ).onload( function( window ) {
                         this.queue.splice( this.queue.indexOf( newFunctionToCall ), 1 );
                     }
                 }
-            }, this);
+            }
+            if ( this._tickHandlersFromMethod[method] == null ) {
+                this._tickHandlersFromMethod[method] = [tickHandler];
+            } else {
+                this._tickHandlersFromMethod[method].push( tickHandler );
+            }
+            this.addEventListener( "tick", tickHandler, this);
             if ( this.autoStartStop && !this.running ) {
                 this.startLoop();
             }
         },
         //TODO: removeFromQueue: function removeFromQueue( method, 
+        removeFromQueue: function( method ) {
+            var tickHandlers = this._tickHandlersFromMethod[ method ],
+                idInQueue = this.queue.indexOf( method );
+            if ( idInQueue !== -1 ) {
+                var i = 0,
+                    len = tickHandlers.length,
+                for ( ; i < len; i++ ) {
+                    this.removeEventListener( "tick", tickHandlers[i], this );
+                }
+                return this.queue.splice( idInQueue, 1 );
+            }
+        },
         getQueue: function getQueue() {
             return this.queue.slice(0);
         },
@@ -256,6 +276,7 @@ lib.requires( "lib.Events" ).onload( function( window ) {
     lib.Timer.prototype.pause.toString = createToString( "function pause() { [lib code] }" );
     lib.Timer.prototype.resume.toString = createToString( "function resume() { [lib code] }" );
     lib.Timer.prototype.addToQueue.toString = createToString( "function addToQueue() { [lib code] }" );
+    lib.Timer.prototype.removeFromQueue.toString = createToString( "function removeFromQueue() { [lib code] }" );
 
     lib.loaded("lib.Timer");
 

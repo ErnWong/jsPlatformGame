@@ -6,6 +6,8 @@
     "lib.Events.EventListener": "lib/Events.js",
     "lib.Timer": "lib/Timer.js",
     "lib.Math": "lib/Math.js",
-    "lib.Probability": "lib/Probability.js"
+    "lib.Probability": "lib/Probability.js",
+    "lib.Resources": "lib/Resources.js",
+    "lib.Audio": "lib/Audio.js"
 }
 

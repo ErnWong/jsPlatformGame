@@ -34,10 +34,16 @@ lib.requires( "lib.Class" ).onload( function() {
         type: "",
         target: null,
         cancelable: false,
-        preventDefault: function() {},
+        defaultPrevented: false,
+        preventDefault: function() {
+            if ( this.cancelable ) {
+                this.defaultPrevented = true;
+            }
+        },
         initEvent: function( type, target ) {
             this.type = type;
             this.target = target;
+            this.timeStamp = (new Date()).getTime();
         }
     }, "Event" );
     LEvent = _.Event;
@@ -135,6 +141,7 @@ lib.requires( "lib.Class" ).onload( function() {
                     listener.listener.handleEvent.call( listener.scope, evt );
                 }
             }
+            return evt.defaultPrevented;
         }
 
     }, "EventTarget" );

@@ -3,11 +3,12 @@ lib.requires( "lib.Class" ).onload( function() {
 
     lib.Events = {};
     var _ = lib.Events,
-    EventListener, LEvent,
-    ObjToString = Object.prototype.toString,
-    docCreateEvent = document.createEvent,
-    EvtTypeException = new TypeError( "Event object missing \"type\" property" ),
-    EvtListenerException = new TypeError( "Event Listener is not in the correct type" ),
+        EventListener, LEvent,
+        ObjToString = Object.prototype.toString,
+        docCreateEvent = document.createEvent,
+        EvtTypeException = new TypeError( "Event object missing \"type\" property" ),
+        EvtListenerException = new TypeError( "Event Listener is not in the correct type" ),
+        getTime = Date.now,
 
 
         createToString = function( value ) {
@@ -43,7 +44,7 @@ lib.requires( "lib.Class" ).onload( function() {
         initEvent: function( type, target ) {
             this.type = type;
             this.target = target;
-            this.timeStamp = (new Date()).getTime();
+            this.timeStamp = getTime();
         }
     }, "Event" );
     LEvent = _.Event;
@@ -60,7 +61,7 @@ lib.requires( "lib.Class" ).onload( function() {
     lib.createEvent = function( eventType ) {
         if (eventTypes[eventType] != null ) {
             var newEvent = new eventTypes[eventType]();
-            newEvent.timeStamp = (new Date()).getTime();
+            newEvent.timeStamp = getTime();
             return newEvent;
         } else {
             return docCreateEvent( eventType );
@@ -78,9 +79,11 @@ lib.requires( "lib.Class" ).onload( function() {
 
             var thisListeners = this._listeners[type];
             if ( (!(thisListeners == null)) && ( function() {
-                var thisArg = typeof scope === "object"? scope : null;
+                var thisArg = typeof scope === "object"? scope : null,
+                    curListener;
                 for ( var i = 0, len = thisListeners.length; i < len; i++ ) {
-                    if ( (thisListeners[i].listener === listener || thisListeners[i].listener.handleEvent === listener) && thisListeners[i].scope === thisArg ) {
+                    curListener = this.listeners[i];
+                    if ( /*(curListener.listener === listener || */curListener.listener.handleEvent === listener/*)*/ && curListener.scope === thisArg ) {
                         return true;
                     }
                 }
@@ -107,7 +110,7 @@ lib.requires( "lib.Class" ).onload( function() {
                     i = 0,
                     len = thisListeners.length;
                 for ( ; i < len; i++ ) {
-                    if ( (thisListeners[i].listener === listener || thisListeners[i].listener.handleEvent === listener) && thisListeners[i].scope === thisArg ) {
+                    if ( /*(thisListeners[i].listener === listener ||*/ thisListeners[i].listener.handleEvent === listener/*)*/ && thisListeners[i].scope === thisArg ) {
                         thisListeners.splice( i, 1 );
                         return;
                     }
@@ -131,14 +134,15 @@ lib.requires( "lib.Class" ).onload( function() {
             }
             var i = 0,
                 listeners = this._listeners[evt.type],
-                len = listeners.length;
+                len = listeners.length,
+                handler;
             if ( ObjToString.call( listeners ) === "[object Array]" ) {
                 for ( ; i < len; i++ ) {
-                    var listener = listeners[i];
-                    if ( typeof listener.listener.handleEvent !== "function" ) {
+                    handler = listeners[i].listener.handleEvent;
+                    if ( typeof handler !== "function" ) {
                         throw EvtListenerException;
                     }
-                    listener.listener.handleEvent.call( listener.scope, evt );
+                    handler.call( listeners[i].scope, evt );
                 }
             }
             return evt.defaultPrevented;

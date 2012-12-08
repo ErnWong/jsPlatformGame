@@ -4,7 +4,8 @@ lib.require( "lib.Events", "lib.Resources" ).onload( function(window, undefined)
     "use strict";
 
     var Channel, Sound, AudioManager,
-        noPass = [ "toString", "valueOf", "constructor", "isPrototypeOf", "propertyIsEnumerable", "toLocaleString" ];
+        noPass = [ "toString", "valueOf", "constructor", "isPrototypeOf", "propertyIsEnumerable", "toLocaleString" ],
+        ObjCreate = Object.create;
 
     lib.Audio = {};
 
@@ -140,9 +141,9 @@ lib.require( "lib.Events", "lib.Resources" ).onload( function(window, undefined)
         },
         init: function( src, noOfChannels, autoResize ) {
             this.audio = src != null? new Audio( src ) : new Audio();
-            this.src = src != null? String( src ) : "";
+            this.src = src != null? "" + src : "";
             this.channels = [];
-            this.autoResize = Boolean( autoResize );
+            this.autoResize = !!autoResize;
             var i = 0, len = typeof noOfChannels === "number"? noOfChannels >= 0? noOfChannels : 0 : 3;
             for ( ; i < len; i++ ) {
                 this.channels[i] = new Channel( this.audio );
@@ -152,8 +153,8 @@ lib.require( "lib.Events", "lib.Resources" ).onload( function(window, undefined)
 
     AudioManager = lib.Audio.AudioManager = lib.Events.EventTarget.extend( {
         _sounds: [],
-        _soundFromId: Object.create(null),
-        _soundFromSrc: Object.create(null),
+        _soundFromId: ObjCreate(null),
+        _soundFromSrc: ObjCreate(null),
         addSound: function( src, noOfChannels, id, autoResize ) {
             var sound = new Sound( src, noOfChannels, autoResize );
             var addSoundEvt = lib.createEvent( "AudioEvent" );

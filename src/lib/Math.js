@@ -4,14 +4,18 @@ lib.require( "lib.Class" ).onload( function() {
 
     //TODO: test and debug!!
     //TODO: allow caching, i.e. createFunctionFromTable(table)
+    //TODO: see other todos below
 
-    var findRoot, translateFn, inverseOf, integralOf, normalize;
+    var findRoot, translateFn, inverseOf, integralOf, normalize,
+
+        abs = Math.abs;
+        
 
     lib.Math = {};
 
     // by borgar https://gist.github.com/3317728
     // Translated from zeroin.c in http://www.netlib.org/c/brent.shar.
-    lib.Math.findRoot = function findRoot( func, lowerLimit, upperLimit, errorTol, maxIter ) {
+    findRoot = lib.Math.findRoot = function findRoot( func, lowerLimit, upperLimit, errorTol, maxIter ) {
         var a = lowerLimit,
             b = upperLimit,
             c = a,
@@ -32,21 +36,21 @@ lib.require( "lib.Class" ).onload( function() {
 
             prev_step = b - a;
 
-            if ( Math.abs(fc) < Math.abs(fb) ) {
+            if ( abs(fc) < abs(fb) ) {
                 // Swap data for b to be the best approximation
                 a = b, b = c, c = a;
                 fa = fb, fb = fc, fc = fa;
             }
 
-            tol_act = 1e-15 * Math.abs(b) + errorTol / 2;
+            tol_act = 1e-15 * abs(b) + errorTol / 2;
             new_step = ( c - b ) / 2;
 
-            if ( Math.abs(new_step) <= tol_act || fb === 0 ) {
+            if ( abs(new_step) <= tol_act || fb === 0 ) {
                 return b; // Acceptable approx. is found
             }
 
             // Decide if the interpolation can be tried
-            if ( Math.abs(prev_step) >= tol_act && Math.abs(fa) > Math.abs(fb) ) {
+            if ( abs(prev_step) >= tol_act && abs(fa) > abs(fb) ) {
                 // If prev_step was large enough and was in true direction, Interpolatiom may be tried
                 var t1, cb, t2;
                 cb = c - b;
@@ -68,8 +72,8 @@ lib.require( "lib.Class" ).onload( function() {
                     p = -p;  // and assign possible minus to q
                 }
 
-                if ( p < ( 0.75 * cb * q - Math.abs( tol_act * q ) / 2 ) &&
-                    p < Math.abs( prev_step * q / 2 ) ) { 
+                if ( p < ( 0.75 * cb * q - abs( tol_act * q ) / 2 ) &&
+                    p < abs( prev_step * q / 2 ) ) { 
                     // If (b + p / q) falls in [b,c] and isn't too large it is accepted
                     new_step = p / q;
                 }
@@ -77,7 +81,7 @@ lib.require( "lib.Class" ).onload( function() {
                 // If p/q is too large then the bissection procedure can reduce [b,c] range to more extent
             }
 
-            if ( Math.abs( new_step ) < tol_act ) { // Adjust the step to be not less than tolerance
+            if ( abs( new_step ) < tol_act ) { // Adjust the step to be not less than tolerance
                 new_step = ( new_step > 0 ) ? tol_act : -tol_act;
             }
 
@@ -89,28 +93,25 @@ lib.require( "lib.Class" ).onload( function() {
             }
         }
     };
-    var findRoot = lib.Math.findRoot;
 
-    lib.Math.translateFn = function( fn, dy, dx ) {
+    translateFn = lib.Math.translateFn = function( fn, dy, dx ) {
         return function( x ) {
             return fn( x-dx ) + dy;
         };
     };
-    var translateFn = lib.Math.translateFn;
 
-    lib.Math.inverseOf = function( f, a, b, step, err ) {
+    inverseOf = lib.Math.inverseOf = function( f, a, b, step, err ) {
         return function( x ) {
             return findRoot( translateFn( f, -x, 0 ), a, b, err, Infinity );
         };
     };
-    var inverseOf = lib.Math.inverseOf;
 
-    lib.Math.integralOf = function( f, n, a ) {
+    integralOf = lib.Math.integralOf = function( f, n, a ) {
         var i, h, S;
         return function( x ) { //TODO: imporve this by allowing n to change for higher values of x (for accuracy)
-            h = ( x-a ) / n,
+            h = ( x-a ) / n, 
             S = f( a );
-            for ( i = 1; i < n; i += 2 ) {
+            for ( i = 1; i < n; i += 2 ) { //TODO: optimize these loops
                 S += 4 * f( a + h * i );
             }
             for ( i = 2; i < n-1; i += 2 ) {
@@ -120,15 +121,14 @@ lib.require( "lib.Class" ).onload( function() {
             return h * S / 3;
         };
     };
-    var integralOf = lib.Math.integralOf;
 
-    lib.Math.normalize = function( f, n, a, b ) {
+    // american spelling, unfortunately.
+    normalize = lib.Math.normalize = function( f, n, a, b ) {
         var integralSize = integralOf( f, n, a )( b );
         return function( x ) {
             return f( x ) / integralSize;
         };
     };
-    var normalize = lib.Math.normalize;
 
     Math.findRoot = findRoot;
     Math.translateFn = translateFn;

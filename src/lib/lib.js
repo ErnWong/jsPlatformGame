@@ -121,9 +121,15 @@
             };
         }
 
-        var requested, executed, scriptToRequest, scriptIdToURL, ScriptRequest, loadedStrict,
+        if ( !Date.now ) {
+            Date.now = function now() {
+                return (new Date()).getTime();
+            };
+        }
 
-            createOnReadyStateChangeListener = function( scriptURL ) {
+        var requested, executed, scriptToRequest, scriptIdToURL, ScriptRequest, loadedStrict;
+
+            /*createOnReadyStateChangeListener = function( scriptURL ) {
                 return function() {
                     if ( this.readyState === "loaded" || this.readyState === "complete" ) {
                         loadedStrict( scriptURL );
@@ -135,7 +141,7 @@
                 return function() {
                     loadedStrict( scriptURL );
                 };
-            };
+            };*/
 
 
         lib.requested = [];

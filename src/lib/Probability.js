@@ -5,6 +5,7 @@ lib.require( "lib.Class", "lib.Math" ).onload( function( window, undefined ) {
     var inverseOf = Math.inverseOf,
         integralOf = Math.integralOf,
         normalise = Math.normalize,
+        pow = Math.pow,
         getRandomNumber = Math.random,
         ArraySlice = Array.prototype.slice;
         //ObjToString = Object.prototype.toString;
@@ -29,19 +30,19 @@ lib.require( "lib.Class", "lib.Math" ).onload( function( window, undefined ) {
             }
         },
         increase: function increase( n ) {
-            return new Probability( 1 - Math.pow( 1 - this.value, n ) );
+            return new Probability( 1 - pow( 1 - this.value, n ) );
         },
         decrease: function decrease( n ) {
-            return new Probability( 1 - Math.pow( 1 - this.value, -n ) );
+            return new Probability( 1 - pow( 1 - this.value, -n ) );
         },
         test: function test() {
-            return getRandomNumber < this._value;
+            return getRandomNumber() < this._value;
         },
         init: function init( value ) {
             this.set( value || 0 );
         }
     }, "Probability" );
-    //var Probability = lib.Probability;
+    var Probability = lib.Probability;
 
     lib.Probability.ProbDistrib = lib.Class.extend( {
         _fn: undefined,
@@ -90,7 +91,7 @@ lib.require( "lib.Class", "lib.Math" ).onload( function( window, undefined ) {
     lib.Probability.testList = function( probabilities ) {
         var a = ArraySlice.call( probabilities ),
             probSum = 0;
-        while ( a.length > 0 && Math.random() >= a[0] / ( 1 - probSum ) ) {
+        while ( a.length > 0 && getRandomNumber() >= a[0] / ( 1 - probSum ) ) {
             probSum += a[0];
             a.shift();
         }

@@ -17,7 +17,7 @@ lib.requires( "lib.Events" ).onload( function( window ) {
 
         if ( !window.requestAnimationFrame ) {
             window.requestAnimationFrame = function(callback, element) {
-                var currTime = new Date().getTime();
+                var currTime = getTime();
                 var timeToCall = Math.max(0, 16 - (currTime - lastTime));
                 var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
                     timeToCall);
@@ -54,6 +54,7 @@ lib.requires( "lib.Events" ).onload( function( window ) {
                 return value;
             };
         },
+        getTime = Date.now,
 
         modeFromString = Object.create(null);
     modeFromString.animation = 0;
@@ -179,9 +180,9 @@ lib.requires( "lib.Events" ).onload( function( window ) {
             return this.queue.slice(0);
         },
 
-        getCurrentTime: function getCurrentTime() {
+        /*getCurrentTime: function getCurrentTime() {
             return (new Date()).getTime();
-        },
+        },*/ //use Date.now();
 
         pause: function pause() {
             this.paused = true;
@@ -193,7 +194,7 @@ lib.requires( "lib.Events" ).onload( function( window ) {
             this.startLoop();
         },
         startLoop: function startLoop() {
-            this.prevTime = (new Date()).getTime();
+            this.prevTime = getTime();
             this.running = true;
             if ( this.mode === this.steady ) {
                 this.sysTimerId = setInterval( ( function( self ) {
@@ -208,7 +209,7 @@ lib.requires( "lib.Events" ).onload( function( window ) {
 
         tick: function tick() {
             //maybe not if ( !( this instanceof lib.Timer) ) throw new TypeError(blahblahblah...);
-            if ( this._clearIntervalFlag && this.sysTimer != -1 ) {
+            if ( this._clearIntervalFlag && this.sysTimer !== -1 ) {
                 clearInterval( this.sysTimerId );
                 this.sysTimerId = -1;
                 this._clearIntervalFlag = false;
@@ -218,7 +219,7 @@ lib.requires( "lib.Events" ).onload( function( window ) {
             if ( this.paused ) {
                 return;
             }
-            var currentTime = (new Date()).getTime();
+            var currentTime = getTime();
             this.dt = ( currentTime - this.prevTime ) / 1000;
             if ( this.dt > this.maxDelta ) {
                 this.dt = this.maxDelta;

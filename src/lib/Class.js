@@ -81,7 +81,8 @@
     } else {
         lib.Class.extend = function extend( def, name, leaveToString ) {
 
-            /*var _super = this.prototype;
+            /*Original*
+            var _super = this.prototype;
 
             this.initialising = true;
             var prototype = new this();
@@ -117,9 +118,10 @@
             Class.prototype.constructor = Class;
             Class.extend = extend;
 
-            return Class;*/
+            return Class;
+            //*/
 
-            //experiment: fix the naming of prototypes in Chrome's console
+            /*experiment: fix the naming of prototypes in Chrome's console*/
 
             var _super = this.prototype,
 
@@ -152,6 +154,8 @@
             Class.extend = extend;
 
             return Class;
+
+            //*/
 
         };
     }

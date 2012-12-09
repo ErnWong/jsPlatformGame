@@ -8,7 +8,7 @@
 
     var lib = {},
 
-        head = window.document.getElementsByTagName( "head" )[0],
+        head = window.document.getElementsByTagName( "head" )[0] || window.document.documentElement,    // TODO: is this okay? ...the "|| documentElement" part?
 
         // the path (URL) to the script-id-to-path key (JSON)
         SCRIPT_ID_TO_URL_PATH = "lib/Classes.js",

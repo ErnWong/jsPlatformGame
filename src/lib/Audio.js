@@ -1,11 +1,15 @@
 //TODO: allow stopping of sound
+//TODO: allow loading, loaded and such events
+//TODO: createEvent = lib.createEvent
 
 lib.require( "lib.Events", "lib.Resources" ).onload( function(window, undefined) {
     "use strict";
 
     var Channel, Sound, AudioManager,
         noPass = [ "toString", "valueOf", "constructor", "isPrototypeOf", "propertyIsEnumerable", "toLocaleString" ],
-        ObjCreate = Object.create;
+        ObjCreate = Object.create,
+        AudioResource = lib.Resources.AudioResource,
+        ResourceManager = lib.Resources.ResourceManager;
 
     lib.Audio = {};
 
@@ -95,9 +99,13 @@ lib.require( "lib.Events", "lib.Resources" ).onload( function(window, undefined)
     Sound = lib.Audio.Sound = lib.Events.EventTarget.extend( {
         src: "",
         audio: new Audio(),
+        ready: false,
         channels: [],
         autoResize: false,
         play: function( volume ) {
+            if ( !this.ready ) {
+                return; //TODO: test this
+            }
             var i = 0,
                 channels = this.channels,
                 len = channels.length,
@@ -140,14 +148,94 @@ lib.require( "lib.Events", "lib.Resources" ).onload( function(window, undefined)
             } );
         },
         init: function( src, noOfChannels, autoResize ) {
-            this.audio = src != null? new Audio( src ) : new Audio();
-            this.src = src != null? "" + src : "";
+            /*if ( src instanceof AudioResource ) { // this and the following is  B A D (should use ResourceManager to load):
+                this.audio = src.getAudio();
+            } else if ( typeof src === "string" ) {
+                var resource = ResourceManager.get( src );
+                this.audio = resource? resource.getAudio() : new Audio( src );
+            } else {
+                this.audio = new Audio();
+            }*/
+            // better:
+            /*if ( src instanceof AudioResource ) {
+                if ( src.ready ) {
+                    this.audio = src.getAudio();
+                    this.loaded = true;
+                } else {
+                    this.audio = new Audio();
+                    var self = this;
+                    src.addEventListener( "ready", function() {
+                        self.audio = src.getAudio();
+                        self.loaded = true;
+                    } );
+                }
+            } else if ( typeof src === "string" ) {
+                var resource = ResourceManager.get( src ) || ResourceManager.add( src, src, "audio" );
+                if ( resource.ready ) {
+                    
+                }
+            }*///na, discontinued it because it repeated code. Here's a slightly better version, I hope:
+
+            //TODO: test, test, test!
+            this.ready = false;
             this.channels = [];
-            this.autoResize = !!autoResize;
-            var i = 0, len = typeof noOfChannels === "number"? noOfChannels >= 0? noOfChannels : 0 : 3;
-            for ( ; i < len; i++ ) {
-                this.channels[i] = new Channel( this.audio );
+
+            var resource = src instanceof AudioResource?
+                            src :
+                            typeof src === "string?"?
+                                ResourceManager.get( src ) || ResourceManager.add( src, src, "audio" ) :
+                                null,
+                self = this,
+                setupAudio = function setupAudio() {
+                    var i = 0,
+                        len = typeof noOfChannels === "number"? noOfChannels >= 0? noOfChannels : 0 : 3,
+                        audio = self.audio, loadEvent;
+                    audio = resource.getAudio();
+                    for ( ; i < len; i++ ) {
+                        self.channels[i] = new Channel( audio );
+                    }
+                    self.src = audio.src;
+                    self.loaded = true;
+                    readyEvent = lib.createEvent( "AudioEvent" );
+                    readyEvent.initEvent( "ready", self, {
+                        sound: self,
+                        cancelable: false
+                    } );
+                    self.dispatchEvent( readyEvent );
+                }
+            if ( resource ) {
+                if ( resource.ready ) {
+                    /*var i = 0,
+                        len = typeof noOfChannels === "number"? noOfChannels >= 0? noOfChannels : 0 : 3,
+                        audio = this.audio;
+                    this.audio = src.getAudio();
+                    for ( ; i < len; i++ ) {
+                        this.channels[i] = new Channel( this.audio );
+                    }
+                    this.src = audio.src;
+                    this.loaded = true;*/
+                    setupAudio();
+                } else {
+                    this.audio = new Audio();
+                    var self = this;
+                    resource.addEventListener( "load", setupAudio );
+                    /*resource.addEventListener( "ready", function() {
+                        var i = 0,
+                            len = typeof noOfChannels === "number"? noOfChannels >= 0? noOfChannels : 0 : 3,
+                            audio = self.audio;
+                        audio = resource.getAudio();
+                        for ( ; i < len; i++ ) {
+                            self.channels[i] = new Channel( audio );
+                        }
+                        self.src = audio.src;
+                        self.loaded = true;
+                    } );*/
+                }
+            } else {
+                this.audio = new Audio();
             }
+
+            this.autoResize = !!autoResize;
         }
     } );
 
@@ -155,9 +243,12 @@ lib.require( "lib.Events", "lib.Resources" ).onload( function(window, undefined)
         _sounds: [],
         _soundFromId: ObjCreate(null),
         _soundFromSrc: ObjCreate(null),
+        _loadedCount: 0,
+        _count: 0,
+        ready: false,
         addSound: function( src, noOfChannels, id, autoResize ) {
-            var sound = new Sound( src, noOfChannels, autoResize );
-            var addSoundEvt = lib.createEvent( "AudioEvent" );
+            var sound = new Sound( src, noOfChannels, autoResize ),
+                addSoundEvt = lib.createEvent( "AudioEvent" );
             addSoundEvt.initEvent( "beforeAdd", this, {
                 sound: sound,
                 soundId: id!= null? id : undefined,
@@ -170,6 +261,30 @@ lib.require( "lib.Events", "lib.Resources" ).onload( function(window, undefined)
             this._soundFromSrc[src] = sound;
             if ( id != null ) {
                 this._soundFromId[id] = sound;
+            }
+            if ( !sound.ready ) {
+                this._cound++;
+                var self = this,
+                    unreadyEvent = lib.createEvent( "AudioEvent" );
+                unreadyEvent.initEvent( "unready", this, {
+                    sound: sound,
+                    soundId: id != null? id : undefined,
+                    cancelable: false
+                };
+                this.dispatchEvent( unreadyEvent );
+                sound.addEventListener( "ready", function() {
+                    self._loadedCount++;
+                    if ( self._loadedCount >= _self.count ) {
+                        self.ready = true;
+                        var readyEvent = lib.createEvent( "AudioEvent" );
+                        readyEvent.initEvent( "ready", self, {
+                            sound: sound,
+                            soundId: id != null? id : undefined,
+                            cancelable: false
+                        } );
+                        self.dispatchEvent( readyEvent );
+                    }
+                } );
             }
             addSoundEvt = lib.createEvent( "AudioEvent" );
             addSoundEvt.initEvent( "add", this, {

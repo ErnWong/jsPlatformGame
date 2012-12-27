@@ -1,14 +1,16 @@
 lib.require( "lib.Events" ).onload( function( window, undefined ) {
     "use strict"
 
+// TODO: finish this and maybe have a createResourceType( loadEventId, properties );
+
     var ResourceFromType, Resource, AudioResource, ImageResource, VideoResource, JSONResource, XMLResource, HTMLResource, BinaryResource, TextResource, SpritesheetResource,
         ObjCreate = Object.create,
-        ObjToString = Object.prototype.toString; //TODO: add createEvent = lib.createEvent;
+        ObjToString = Object.prototype.toString; // TODO: add createEvent = lib.createEvent;
 
     lib.Resources = {};
 
     lib.Resources.ResourceEvent = lib.createEventType( "ResourceEvent", {
-        //TODO: add properties here
+        // TODO: add properties here
     } );
 
     lib.Resources.Resource = Resource = lib.Events.EventTarget.extend( {    // events: load, /*ready,*/ possibly loadingStart
@@ -17,6 +19,7 @@ lib.require( "lib.Events" ).onload( function( window, undefined ) {
         loaded: false,
         //ready: false,
         load: function() { },
+        loading: false,
         init: function( src ) {
             this.src = src;
         }
@@ -28,13 +31,23 @@ lib.require( "lib.Events" ).onload( function( window, undefined ) {
             audioManager.
         },*/
         getAudio: function() {
-            if ( !this.
-            return this.audio.clone( true );                //TODO: clone OR new Audio ?
+            if ( this.audio && !this.loading  ) {
+                return this.audio.clone( true );                //TODO: clone OR new Audio ?
+            }
         },
         load: function() {
-            var self = this;
+            if ( this.loading || this.loaded ) return;
+            var self = this,
+                beforeLoadEvent = lib.createEvent( "ResourceEvent" );
+            beforeLoadEvent.initEvent( "beforeLoad", this, {
+                // TODO: add properties here
+            } );
+            if ( this.dispatchEvent( beforeLoadEvent ) ) {
+                return;
+            }
             this.audio.addEventListener( "canplaythrough", function() {
                 self.loaded = true; // yes, it's "loaded"
+                self.loading = false;
                 var loadEvent = lib.createEvent( "ResourceEvent" );
                 loadEvent.initEvent( "load", self, {
                     // TODO: add properties here
@@ -42,6 +55,7 @@ lib.require( "lib.Events" ).onload( function( window, undefined ) {
                 self.dispatchEvent( loadEvent );
             } );
             this.audio.src = this.src; //may need to append child for a certain browser, according to http://phoboslab.org/log/2011/03/multiple-channels-for-html5-audio
+            this.loading = true;
         },
         init: function( src ) {
             this.src = src;
@@ -59,7 +73,21 @@ lib.require( "lib.Events" ).onload( function( window, undefined ) {
             return img;
         },
         load: function() {
-
+            if ( this.loading || this.loaded ) return;
+            var self = this,
+                beforeLoadEvent = lib.createEvent( "ResourceEvent" );
+            beforeLoadEvent.initEvent( "beforeLoad", this, {
+                // TODO: add properties here
+            } );
+            if ( this.dispatchEvent( beforeLoadEvent ) ) {
+                return;
+            }
+            this.img = new Image();
+            this.img.src = this.src;
+            this.img.addEventListener( "load", function() {
+                self.loaded = true...
+            });
+            this.loading = true;
         }
     }, "ImageResource" );
 
@@ -85,17 +113,40 @@ lib.require( "lib.Events" ).onload( function( window, undefined ) {
         _resources: [],
         _resourcesById: ObjCreate( null ),
         _resourcesBySrc: ObjCreate( null ),
+        _loadedCount: 0,
+        _totalCount: 0,
+        allLoaded: false,
         add: function( src, id, type ) {
+            var resource = new ( ResourceFromType[ type ] || OtherResource );
+            
             //at the end: return resource
         },
         remove: function( q ) {
 
         },
         load: function( q ) {
-
+            var resources = this.get( q );
+            if ( ObjToString.call( resources ) === "[object Array]" ) {
+                for ( var i = 0, len = resources.length; i < len; i++ ) {
+                    if ( !resources[i].loaded ) {
+                        resources[i].load();
+                    }
+                }
+            } else if ( typeof resources.load === "function" && !resources.loaded ) {
+                resources.load();
+            }
         },
         loadAll: function() {
-
+            if ( this.allLoaded ) {
+                return;
+            }
+            var i = 0, resources = this._resource, len = resources.length, resource;
+            for ( ; i < len; i++ ) {
+                resources = resources[i];
+                if ( !resource.loaded ) {
+                    resource.load();
+                }
+            }
         },
         get: function( q, nonGreedy ) {
             var resources = this._resources;                // TODO: test to see if caching is worth it

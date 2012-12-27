@@ -183,7 +183,7 @@ lib.require( "lib.Events", "lib.Resources" ).onload( function(window, undefined)
             var resource = src instanceof AudioResource?
                             src :
                             typeof src === "string?"?
-                                ResourceManager.get( src ) || ResourceManager.add( src, src, "audio" ) :
+                                ResourceManager.get( src, true ) || ResourceManager.add( src, src, "audio" ) :
                                 null,
                 self = this,
                 setupAudio = function setupAudio() {

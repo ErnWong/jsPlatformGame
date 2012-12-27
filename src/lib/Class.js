@@ -15,7 +15,7 @@
     }
 
     var initialising = false,
-        testFor_super = ( /abc/.test( function(){abc;} ) )? /\b_parent\b/ : /.*/,
+        testFor_super = ( /abc/.test( function(){abc;} ) )? /\b_super\b/ : /.*/,
         ConstructorCallException = new TypeError("Class constructor cannot be called as a function."),
         createToString = function( value ) {
             return function toString() {

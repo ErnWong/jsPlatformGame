@@ -40,7 +40,9 @@ lib.requires( "game.Character", "KeyboardJS" ).onload( function() {
             released = true;
         }
         this.pos.x += this.vel.x * evt.delta;
-        this.pos.y += this.vel.y * evt.delta; if ( this.pos.y < 0 && !A && !B ) {
+        this.pos.y += this.vel.y * evt.delta;
+        this.vel.y *= 1-8*evt.delta; // le magic formula to make it work well (TODO: may need to tweak value)
+        if ( this.pos.y < 0 && !A && !B ) {
             onGround = true;
             released = false;
             this.pos.y = 0;
